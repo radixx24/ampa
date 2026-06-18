@@ -1,0 +1,30 @@
+# Modelos y datos (pesados, no se versionan)
+models/
+data/
+*.gguf
+*.bin
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# C++ / compilación
+build/
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+
+# Entorno y editores
+.env
+.vscode/
+.idea/
+.DS_Store
