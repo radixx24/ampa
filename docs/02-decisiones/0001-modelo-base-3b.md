@@ -18,8 +18,9 @@ Referencias de consumo y velocidad (CPU de 4 núcleos, cuantización Q4_K_M):
 
 ## Decisión
 
-Usar un **modelo base de ~3B parámetros cuantizado a Q4** (candidatos: Qwen2.5-3B,
-Llama-3.2-3B), ejecutado con `llama.cpp`.
+Usar un **modelo base pequeño de 1.7B–3B parámetros cuantizado a Q4**, ejecutado con
+`llama.cpp`. Candidatos: SmolLM2-1.7B, Granite-3.3-2B, Qwen2.5-3B, Phi-3-mini
+(todos con licencias permisivas y verificados en el informe de investigación).
 
 El sistema se diseñará para que **cambiar de modelo sea trivial** (la ruta del GGUF
 es configuración, no código), de modo que migrar a 7–8B más adelante sea solo

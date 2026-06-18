@@ -82,3 +82,56 @@ dirección que **reduce el error**.
 Término propio de AMPA: la parte del sistema que distingue **el origen** de una
 afirmación —de la base, aprendida del usuario, o desconocida— y su nivel de
 confianza.
+
+### Memoria dinámica
+La memoria de AMPA que **persiste** entre sesiones y **evoluciona**: pondera por
+relevancia y recencia, refuerza lo recurrente y archiva lo poco usado. No es un
+cajón estático.
+
+### Semilla (seed)
+Un número que inicializa el generador de aleatoriedad. Con la **misma semilla** se
+obtiene **el mismo resultado**: así una respuesta "aleatoria" se vuelve
+**reproducible**. Clave para el rigor científico de AMPA.
+
+### Monte Carlo
+Familia de métodos que usan **muestreo aleatorio** para explorar resultados
+posibles. En AMPA: generar varias respuestas candidatas y contrastarlas
+(auto-consistencia) para elegir o combinar la mejor.
+
+### Temperatura y top-p
+Dos perillas que controlan cuán "creativa" o "conservadora" es la generación.
+**Temperatura** alta = más variedad; **top-p** limita la elección a las opciones más
+probables. Juntas modulan el dinamismo de las respuestas.
+
+### SentencePiece
+Herramienta para crear un **tokenizer** propio de forma agnóstica al idioma (BPE o
+unigram), con soporte en C++ y Python. La usaremos en la pista educativa.
+
+### FAISS
+Biblioteca en C++ (con bindings de Python) para **búsqueda por similitud** entre
+vectores a gran velocidad. Candidata para la memoria de AMPA en escritorio.
+
+### sqlite-vec
+Extensión de SQLite para búsqueda vectorial **embebida y ultraligera**: corre "casi
+en cualquier parte". Alternativa portable a FAISS.
+
+### safetensors
+Formato **seguro y rápido** para guardar los pesos de un modelo, sin los riesgos del
+`pickle` de Python. Se usa al entrenar; para inferir se convierte a GGUF.
+
+### PEFT (Parameter-Efficient Fine-Tuning)
+Conjunto de técnicas para **adaptar** un modelo grande entrenando solo una pequeña
+parte de sus parámetros. LoRA y QLoRA son ejemplos.
+
+### QLoRA
+Variante de LoRA que carga el modelo base **cuantizado a 4 bits** y entrena solo los
+adaptadores. Hace viable la adaptación con poco hardware.
+
+### Escriba
+Módulo de AMPA que puede **escribir y corregir archivos** en Windows o Linux (rutas
+con `pathlib`), siempre creando un **backup** previo y dentro de un espacio acotado.
+
+### Diátaxis
+Marco para organizar documentación en cuatro tipos: **tutoriales**, **guías
+how-to**, **referencia** y **explicación**. Evita mezclar "cómo se usa" con "por qué
+existe".

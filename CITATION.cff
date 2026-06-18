@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: "AMPA — Aprendizaje Multidominio con Patrones Adaptativos"
+message: "Si usas este software, por favor cítalo como se indica."
+type: software
+# Solo autores humanos. Por decisión del proyecto, ningún asistente de IA
+# figura como autor o coautor.
+authors:
+  - given-names: "radixx24"
+    family-names: "(completar con tu apellido)"
+    email: "radixx24@gmail.com"
+    alias: "radixx24"
+repository-code: "https://github.com/radixx24/ampa"
+abstract: >-
+  Sistema de lenguaje local, incremental y documentado para CPU con 16 GB de RAM.
+  Combina un modelo base pequeño con una memoria dinámica que aprende, sobre todo,
+  de los apuntes de investigación del autor, con eje temático en química y filosofía.
+keywords:
+  - llm-local
+  - rag
+  - quimica
+  - filosofia
+  - cpp
+  - python
+license: "TODO: elegir licencia (p. ej. Apache-2.0 o MIT)"

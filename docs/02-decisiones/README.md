@@ -21,6 +21,9 @@ Cada ADR sigue esta plantilla:
 
 | ADR | Título | Estado |
 |---|---|---|
-| [0001](0001-modelo-base-3b.md) | Modelo base de ~3B cuantizado | Aceptado |
+| [0001](0001-modelo-base-3b.md) | Modelo base pequeño (1.7B–3B) cuantizado | Aceptado |
 | [0002](0002-aprendizaje-rag-primero.md) | Aprendizaje vía RAG primero, ganchos para LoRA | Aceptado |
 | [0003](0003-dos-pistas-paralelo.md) | Dos pistas de desarrollo en paralelo | Aceptado |
+| [0004](0004-cambio-dominios.md) | Cambio de dominios: química y filosofía | Aceptado |
+| [0005](0005-apuntes-propios-escritura-backups.md) | Apuntes propios como fuente; escritura con backups | Aceptado |
+| [0006](0006-memoria-dinamica-simulaciones.md) | Memoria dinámica y simulaciones aleatorias | Aceptado |

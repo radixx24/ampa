@@ -2,12 +2,12 @@
 
 **AMPA — Aprendizaje Multidominio con Patrones Adaptativos**
 
-> Un asistente local que combina una **base de conocimientos propia** (medicina,
-> psicología y filosofía) con la capacidad de **aprender de lo que tú le enseñas**.
-> Pensado para correr en **CPU con 16 GB de RAM**, sin GPU ni nube.
+> Un sistema de lenguaje **local, incremental y documentado** que corre en **CPU con
+> 16 GB de RAM**. Aprende —sobre todo— de **tus propios apuntes de investigación**,
+> con eje temático en **química** y **filosofía**. Sin GPU, sin nube.
 
 > ℹ️ *El nombre "AMPA" es una propuesta de significado. Si para ti significa otra
-> cosa, lo ajustamos sin problema.*
+> cosa, lo ajustamos.*
 
 ---
 
@@ -16,49 +16,60 @@
 🚧 **Fase 0 — Fundación.** Definiendo visión, arquitectura y documentación.
 Todavía no hay código ejecutable; estamos construyendo la idea sobre bases sólidas.
 
+📄 **Punto de partida:** lee el [**Concepto Maestro**](docs/concepto-maestro.md), que
+conjunta toda la visión del proyecto.
+
 ## La idea en una frase
 
-No entrenamos un LLM desde cero (eso requiere GPUs y mucho dinero). Construimos un
-**sistema** alrededor de un modelo base pequeño que: **(1)** ya sabe de medicina,
-psicología y filosofía gracias a una base de conocimientos curada, y **(2)
-aprende** de cada cosa que le enseñas, desde el primer día.
+No entrenamos un LLM desde cero (eso requiere GPUs y datos masivos). Construimos una
+**arquitectura de conocimiento actualizable**: un modelo base pequeño rodeado de una
+**memoria dinámica** que aprende de lo que tú investigas y escribes.
 
-## Qué es y qué no es
+## Los dos dominios
 
-| AMPA **es** | AMPA **no es** |
-|---|---|
-| Un asistente local que aprende de ti | Un GPT entrenado desde cero |
-| Apoyo educativo y de razonamiento | Consejo médico ni diagnóstico clínico |
-| Privado: corre en tu máquina | Un servicio en la nube |
-| Multidominio (medicina, psicología, filosofía) | Un sustituto de un profesional |
+- **Ciencia, con eje en la química** — la "ciencia central" de la materia.
+- **Filosofía** — como lente epistemológica: *filosofía de la ciencia*, lógica, ética.
+
+## Qué hace, en breve
+
+- **Aprende de tus apuntes (90/10):** ~90% tu investigación, ~10% una base curada.
+- **Memoria dinámica persistente:** recuerda entre sesiones; prioriza por relevancia
+  y recencia.
+- **Escriba multiplataforma + backups:** puede corregir documentación en Windows o
+  Linux, siempre con copia de seguridad previa.
+- **Simulaciones aleatorias reproducibles:** respuestas más dinámicas, con semilla
+  fija para no perder rigor científico.
+- **Citas y honestidad:** responde con fuentes y sabe decir *"no lo sé"*.
 
 ## Requisitos objetivo
 
 - **CPU** x86-64 con AVX2 (la mayoría de procesadores desde ~2015)
-- **16 GB de RAM**
-- **Sin GPU obligatoria**
+- **16 GB de RAM** · **Sin GPU obligatoria**
 - Linux / Windows / macOS
 
 ## Dos pistas de desarrollo (en paralelo)
 
 1. **El sistema AMPA** — motor de inferencia en **C++** (`llama.cpp`) + orquestación
-   **RAG** en **Python**. Es el asistente usable.
+   **RAG** en **Python**, con memoria, escriba y motor de dinamismo.
 2. **Red neuronal desde cero** — un MLP en **Python (NumPy)** y su espejo en **C++**,
-   con fines educativos y como **clasificador de dominio** real del sistema.
+   más un mini-tokenizer/transformer didáctico. Educa y sirve como **clasificador de
+   dominio** del sistema.
 
 ## Documentación
 
 | Documento | Contenido |
 |---|---|
-| [`docs/00-vision.md`](docs/00-vision.md) | El porqué, principios y qué hace nuevo a AMPA |
-| [`docs/01-arquitectura.md`](docs/01-arquitectura.md) | Las piezas, el flujo y la estructura del repo |
+| [`docs/concepto-maestro.md`](docs/concepto-maestro.md) | **Visión unificada (empieza aquí)** |
+| [`docs/00-vision.md`](docs/00-vision.md) | El porqué, principios y diferenciadores |
+| [`docs/01-arquitectura.md`](docs/01-arquitectura.md) | Componentes, flujo y estructura |
 | [`docs/02-decisiones/`](docs/02-decisiones/) | Registros de decisión (ADR) |
 | [`docs/03-roadmap.md`](docs/03-roadmap.md) | Fases e hitos |
 | [`docs/04-glosario.md`](docs/04-glosario.md) | Términos en lenguaje claro |
 | [`docs/05-base-conocimiento.md`](docs/05-base-conocimiento.md) | Fuentes, licencias y ética |
+| [`CHANGELOG.md`](CHANGELOG.md) | Historial de cambios |
+| [`CITATION.cff`](CITATION.cff) | Cómo citar (solo autores humanos) |
 
-## Aviso importante
+## Aviso
 
-AMPA es una herramienta **educativa y de apoyo**. **No sustituye** a un profesional
-de la salud, la salud mental ni a cualquier otro especialista. Ver
-[`docs/05-base-conocimiento.md`](docs/05-base-conocimiento.md) para el detalle ético.
+AMPA es una herramienta **educativa y de investigación**. Sus respuestas pueden
+contener errores; verifica siempre la información importante con fuentes primarias.

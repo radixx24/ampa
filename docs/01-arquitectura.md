@@ -1,90 +1,88 @@
 # 01 — Arquitectura
 
-> Visión técnica de las piezas de AMPA y cómo encajan. Pensada para CPU + 16 GB RAM.
+> Visión técnica de los componentes de AMPA y cómo encajan. Pensada para CPU + 16 GB
+> RAM. Para el panorama unificado, ver [`concepto-maestro.md`](concepto-maestro.md).
 
-## Las cinco piezas
+## Componentes
 
-| # | Pieza | Tecnología | Rol | RAM aprox. |
-|---|---|---|---|---|
-| 1 | **Motor de inferencia** | `llama.cpp` (**C++**) | Ejecuta el modelo en CPU (GGUF, AVX2) | — |
-| 2 | **Modelo base** | LLM 3B cuantizado Q4 | El "cerebro" pre-entrenado | 3–4 GB |
-| 3 | **Base de conocimientos** | Vector DB + embeddings | Memoria de largo plazo (RAG) | <1 GB |
-| 4 | **Orquestación** | **Python** | El pegamento: ingesta, recuperación, prompts | — |
-| 5 | **Red neuronal propia** | NumPy + **C++** | Clasificador de dominio / re-ranker + módulo educativo | mínima |
+| # | Componente | Tecnología | Rol |
+|---|---|---|---|
+| 1 | **Motor de inferencia** | `llama.cpp` (**C++**) | Ejecuta el modelo en CPU (GGUF, AVX2) |
+| 2 | **Modelo base** | LLM 1.7B–3B cuantizado Q4 | El "cerebro" pre-entrenado |
+| 3 | **Memoria dinámica** | Vector DB + embeddings | Aprende de tus apuntes (RAG); persiste y prioriza |
+| 4 | **Escriba + backups** | Python (`pathlib`) | Corrige documentación en Win/Linux con respaldo |
+| 5 | **Motor de dinamismo** | Python | Simulaciones aleatorias reproducibles |
+| 6 | **Orquestación** | **Python** | El pegamento: ingesta, recuperación, prompts |
+| 7 | **Red neuronal propia** | NumPy + **C++** | Clasificador de dominio + módulo educativo |
 
-Con un modelo 3B en Q4 (~3–4 GB) más embeddings y vector DB, el consumo total queda
-holgado por debajo de los 16 GB.
+Con un modelo de 1.7B–3B en Q4 (~1–4 GB) más embeddings y vector DB, el consumo
+total queda holgado por debajo de los 16 GB.
 
 ## Diagrama de alto nivel
 
 ```
-                            ┌──────────────────────────┐
-        Tú  ───pregunta───► │      Interfaz (CLI)       │
-                            └────────────┬─────────────┘
-                                         │
+                         ┌───────────────────────────────┐
+     Tú ───pregunta────► │          Interfaz (CLI)        │
+     Tú ───apuntes─────► │                                │
+                         └───────────────┬───────────────┘
                                          ▼
-                            ┌──────────────────────────┐
-                            │   Orquestador (Python)    │
-                            │  ┌────────────────────┐   │
-                            │  │ 5. Clasificador de │   │  ¿medicina? ¿psicología?
-                            │  │  dominio (NN)      │   │  ¿filosofía?
-                            │  └─────────┬──────────┘   │
-                            └────────────┼─────────────┘
-                                         │
-                  ┌──────────────────────┼──────────────────────┐
-                  ▼                       ▼                       ▼
-        ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐
-        │ 3. Base de       │   │  Memoria de       │   │ 1+2. Motor +     │
-        │  conocimientos   │   │  sesión / largo   │   │  modelo base     │
-        │  (RAG vectorial) │   │  plazo            │   │  (llama.cpp, C++)│
-        └────────┬─────────┘   └────────┬──────────┘   └────────▲─────────┘
-                 │  fragmentos relevantes │                      │
-                 └───────────┬────────────┘                      │
-                             ▼                                   │
-                   ┌──────────────────┐    prompt + contexto     │
-                   │  Constructor de  │ ─────────────────────────┘
-                   │  prompt + fuentes│
-                   └──────────────────┘
-                             │
-                             ▼
-                      respuesta + citas
+                         ┌───────────────────────────────┐
+                         │      Orquestador (Python)      │
+                         │  ┌──────────────┐  ┌─────────┐ │
+                         │  │ Clasificador │  │ Motor de│ │
+                         │  │ de dominio   │  │dinamismo│ │
+                         │  │ (NN propia)  │  │ (azar)  │ │
+                         │  └──────────────┘  └─────────┘ │
+                         └───┬─────────┬─────────┬────────┘
+                  ┌──────────┘         │         └──────────┐
+                  ▼                    ▼                    ▼
+        ┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐
+        │ Memoria dinámica │ │  Escriba +       │ │ Motor + modelo   │
+        │ persistente      │ │  Backups         │ │ base (llama.cpp, │
+        │ (RAG: 90% tus    │ │ (corrige docs    │ │ C++)             │
+        │ apuntes)         │ │  en Win/Linux)   │ │                  │
+        └────────┬─────────┘ └──────────────────┘ └────────▲─────────┘
+                 │  fragmentos citados + contexto           │
+                 └──────────────────────┬───────────────────┘
+                                        ▼
+                       respuesta + fuentes + nivel de confianza
 ```
 
 ## Flujo de una consulta (paso a paso)
 
-1. Escribes una pregunta en la CLI.
-2. El **clasificador de dominio** (nuestra red neuronal) decide si es de medicina,
-   psicología, filosofía o general.
-3. Se generan **embeddings** de la pregunta y se buscan los fragmentos más
-   relevantes en la **base de conocimientos** y en la **memoria** de lo que le
-   enseñaste.
-4. El orquestador arma un **prompt** que incluye la pregunta + esos fragmentos +
-   las instrucciones del sistema.
-5. El **motor (llama.cpp)** ejecuta el modelo y genera la respuesta.
-6. Se devuelve la respuesta **con sus fuentes** y una marca de confianza.
+1. Escribes una pregunta (o ingieres apuntes nuevos) en la CLI.
+2. El **clasificador de dominio** (nuestra red neuronal) decide: química, filosofía
+   o general.
+3. Se generan **embeddings** de la pregunta y se recuperan los fragmentos más
+   relevantes de la **memoria dinámica** (tus apuntes + la base curada).
+4. El **motor de dinamismo** decide cuánta variación aplicar (y con qué semilla).
+5. El orquestador arma el **prompt**: pregunta + fragmentos + instrucciones.
+6. El **motor (llama.cpp)** ejecuta el modelo y genera la respuesta.
+7. Se devuelve la respuesta **con fuentes** y una **marca de confianza**.
 
 ## Las dos pistas de desarrollo
 
 ### Pista 1 — El sistema AMPA (asistente usable)
-Piezas 1–4. Es lo que conviertes en algo que se usa: motor + modelo + RAG + CLI.
+Componentes 1–6: motor + modelo + memoria + escriba + dinamismo + orquestación.
 
 ### Pista 2 — Red neuronal desde cero (educativa + práctica)
-Pieza 5. Un MLP implementado **dos veces** —en Python (NumPy) y en C++— para:
-- **Entender** de verdad forward pass, backpropagation y descenso de gradiente.
-- **Servir** como clasificador de dominio real del sistema (no es un juguete aparte).
+Componente 7: un MLP en NumPy y en C++, más un mini-tokenizer (SentencePiece) y un
+mini-transformer didáctico. **Entiende** los fundamentos y **sirve** como clasificador
+de dominio real del sistema.
 
-Las dos pistas avanzan en paralelo y se encuentran en el clasificador de dominio.
+## Stack tecnológico (alineado con la investigación)
 
-## Stack tecnológico (propuesto)
-
-| Capa | Opción elegida | Alternativas consideradas |
+| Capa | Elección | Alternativas / notas |
 |---|---|---|
-| Inferencia | `llama.cpp` + `llama-cpp-python` | `ctransformers`, `ollama` |
-| Modelo base | Qwen2.5-3B / Llama-3.2-3B (Q4_K_M) | Phi-3.5-mini, Gemma-2-2B |
-| Embeddings | multilingüe (e5 / bge-m3) | MiniLM (solo si va en inglés) |
-| Vector DB | `sqlite-vec` o ChromaDB | FAISS, Qdrant embebido |
-| Orquestación | Python estándar | LangChain, LlamaIndex |
-| NN desde cero | NumPy + C++ (sin libs externas) | PyTorch (solo de referencia) |
+| Inferencia | `llama.cpp` + `llama-cpp-python` | ONNX Runtime GenAI |
+| Modelo base | SmolLM2-1.7B · Granite-3.3-2B · Qwen2.5-3B · Phi-3-mini (Q4) | Licencias permisivas |
+| Embeddings | `multilingual-e5-small` (384 dim) | `bge-small-en` si fuese solo inglés |
+| Vector DB | FAISS (escritorio) | `sqlite-vec` (ultraligero) |
+| Tokenizer (pista 2) | SentencePiece | BPE / unigram |
+| Pesos | `safetensors` (entrenar) → GGUF (inferir) | — |
+| Adaptación (futuro) | PyTorch + Transformers + PEFT + TRL (QLoRA) | Solo ciclos controlados |
+| Orquestación | Python estándar | LangChain / LlamaIndex (opcional) |
+| NN desde cero | NumPy + C++ (sin libs externas) | LibTorch como referencia |
 
 > Las elecciones definitivas se registran como ADR en `02-decisiones/`.
 
@@ -92,25 +90,25 @@ Las dos pistas avanzan en paralelo y se encuentran en el clasificador de dominio
 
 ```
 ampa/
-├── README.md
-├── docs/                       ← toda la documentación
-│   ├── 00-vision.md
-│   ├── 01-arquitectura.md
-│   ├── 02-decisiones/          ← ADRs
-│   ├── 03-roadmap.md
-│   ├── 04-glosario.md
-│   └── 05-base-conocimiento.md
+├── README.md · CHANGELOG.md · CITATION.cff
+├── docs/                       ← toda la documentación (docs-as-code)
+│   ├── concepto-maestro.md     ← visión unificada
+│   ├── 00-vision.md · 01-arquitectura.md · ...
+│   └── 02-decisiones/          ← ADRs
 ├── ampa/                       ← PISTA 1: el sistema (paquete Python)
 │   ├── engine/                 ← wrapper sobre llama.cpp
-│   ├── knowledge/              ← ingesta, troceado, embeddings, vector store
-│   ├── memory/                 ← memoria de sesión + largo plazo (+ ganchos LoRA)
+│   ├── knowledge/              ← ingesta de apuntes: troceo, embeddings
+│   ├── memory/                 ← memoria dinámica persistente (+ ganchos LoRA)
+│   ├── scribe/                 ← escritura multiplataforma + backups
+│   ├── dynamism/               ← motor de simulaciones aleatorias
 │   ├── domains/                ← uso del clasificador de dominio
 │   └── cli/                    ← interfaz de línea de comandos
 ├── nn/                         ← PISTA 2: red neuronal desde cero
-│   ├── python/                 ← MLP en NumPy (forward/backprop)
+│   ├── python/                 ← MLP en NumPy + tokenizer/transformer didáctico
 │   └── cpp/                    ← el mismo MLP en C++
-├── models/                     ← modelos GGUF descargados (no se versionan)
-└── data/                       ← corpus y base vectorial (no se versionan)
+├── models/                     ← modelos GGUF (no se versionan)
+├── data/                       ← apuntes, base vectorial y backups (no se versionan)
+└── experiments/                ← pruebas y evaluación
 ```
 
 > Las carpetas de código se crearán al iniciar cada módulo, documentando el porqué.

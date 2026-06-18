@@ -1,69 +1,73 @@
 # 05 — Base de conocimiento, fuentes y ética
 
-> Cómo construimos la base de conocimientos de AMPA en **medicina**, **psicología** y
-> **filosofía**, con qué fuentes, bajo qué licencias y con qué responsabilidad.
+> Cómo se forma el conocimiento de AMPA: **~90% tus apuntes** + **~10% una base
+> curada** de **química** y **filosofía**. Con qué fuentes, bajo qué licencias y con
+> qué responsabilidad.
+
+## La regla 90/10
+
+- **~90% — tus apuntes.** Tu investigación es la fuente principal. Se ingiere por
+  RAG y es lo que AMPA prioriza al responder.
+- **~10% — base curada.** Un cimiento de fuentes abiertas para que no parta de cero.
 
 ## Principios
 
-1. **Solo fuentes abiertas y legales.** Nada con derechos de autor restrictivos.
+1. **Solo fuentes abiertas y legales.** Nada con derechos restrictivos.
 2. **Trazabilidad.** Cada fragmento conserva su fuente para poder **citarla**.
 3. **Calidad sobre cantidad.** Mejor poco y confiable que mucho y dudoso.
-4. **Responsabilidad en temas sensibles**, en especial salud.
+4. **Reproducibilidad.** Las fuentes y versiones quedan registradas.
 
 ## Fuentes candidatas por dominio
 
-> Antes de ingerir cualquier fuente se verifica su licencia y se registra aquí.
+> Antes de ingerir cualquier fuente se verifica su licencia y se registra abajo.
 
-### Medicina
-- **MedlinePlus** (información de salud al público, dominio público en EE. UU.).
-- **Artículos médicos de Wikipedia** (CC BY-SA).
-- **PubMed Central — subconjunto Open Access** (abstracts y artículos con licencia
-  abierta).
-- **Guías y hojas informativas de la OMS** (según licencia de cada documento).
-
-### Psicología
-- **OpenStax — Psychology** (libro de texto universitario, CC BY).
-- **Obras de dominio público** (p. ej. textos clásicos ya liberados).
-- **Artículos de psicología de Wikipedia** (CC BY-SA).
+### Química / Ciencia
+- **PubChem** (NIH) — datos de compuestos químicos, de uso abierto.
+- **OpenStax — Chemistry** (libro universitario, CC BY).
+- **ChEBI** — entidades químicas de interés biológico, abierto.
+- **Wikipedia / Wikibooks de química** (CC BY-SA).
+- **IUPAC** — nomenclatura y recomendaciones (según licencia de cada documento).
+- **Project Gutenberg** — clásicos de ciencia en dominio público.
 
 ### Filosofía
-- **Project Gutenberg** (dominio público: Platón, Aristóteles, Kant, Nietzsche…).
-- **Stanford Encyclopedia of Philosophy** (verificar términos de uso por entrada).
-- **Artículos de filosofía de Wikipedia** (CC BY-SA).
+- **Project Gutenberg** — clásicos en dominio público (Platón, Aristóteles, Kant…).
+- **PhilArchive** — gran archivo de acceso abierto en filosofía.
+- **PhilPapers** — índice con API; útil para **citación y navegación**, con
+  restricciones de redistribución (no para corpus masivo).
+- **Wikipedia de filosofía** (CC BY-SA).
 
-> ⚠️ Documentos con copyright (p. ej. el **DSM**, manuales comerciales, libros de
-> texto con todos los derechos reservados) **no** se ingieren.
+> ⚠️ **SEP** e **IEP** tienen contenido con copyright: se usan como referencia, **no**
+> como corpus de entrenamiento masivo. Cualquier material con todos los derechos
+> reservados **no** se ingiere.
 
 ## Pipeline de ingesta (resumen)
 
 ```
-documento  →  limpieza  →  troceado  →  embeddings  →  vector DB
-   (.pdf,        (quitar     (fragmentos    (vectores)    (con su
-   .txt,         ruido)      con solape)                  fuente)
-   .md, web)
+fuente/apunte  →  limpieza  →  troceado  →  embeddings  →  memoria (vector DB)
+(.pdf,.txt,.md)   (normalizar)  (con solape)  (multiling.)   (con su fuente y fecha)
 ```
 
-Cada fragmento guarda metadatos: **fuente**, **licencia**, **dominio** y **fecha**.
+Cada fragmento guarda metadatos: **fuente**, **licencia**, **dominio**, **fecha** y
+si es **apunte propio** o **base curada**.
 
-## Ética y límites (importante)
+## Ética y límites
 
-- **AMPA no da consejo médico.** Puede explicar conceptos, pero toda decisión de
-  salud debe consultarse con un profesional. En temas clínicos, el sistema mostrará
-  un **aviso automático**.
-- **No es un terapeuta.** En temas de salud mental sensibles (crisis, autolesión),
-  la respuesta correcta es derivar a ayuda profesional y líneas de apoyo, no
-  improvisar.
-- **Filosofía ≠ verdad absoluta.** Se presentan corrientes y argumentos, señalando
-  que son posturas en debate.
-- **Citar siempre que se pueda.** Si una afirmación viene de la base, se indica de
-  dónde.
+- **AMPA puede equivocarse.** Es apoyo de estudio e investigación, no una autoridad.
+  Verifica lo importante con fuentes primarias.
+- **Citar siempre que se pueda.** Si una afirmación viene de un apunte o fuente, se
+  indica de dónde.
 - **Decir "no lo sé".** Preferible a inventar (alucinar). Es parte de la capa
   epistémica.
+- **Filosofía ≠ verdad absoluta.** Se presentan corrientes y argumentos como posturas
+  en debate, no como dogma.
+- **Respeto a las licencias.** No se redistribuye material protegido.
 
-## Sobre datos del usuario
+## Sobre tus datos y backups
 
-- Lo que le enseñes a AMPA se guarda **localmente**. No sale de tu máquina.
-- Habrá forma de **revisar y borrar** lo aprendido (pendiente de diseño).
+- Tus apuntes y la memoria se guardan **localmente**. No salen de tu máquina.
+- Antes de que el **escriba** corrija cualquier archivo, se crea un **backup** con
+  marca de tiempo. La memoria también se respalda.
+- Habrá forma de **revisar y borrar** lo aprendido.
 
 ## Registro de fuentes ingeridas
 
