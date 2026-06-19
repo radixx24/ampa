@@ -13,7 +13,11 @@ versionado según [SemVer](https://semver.org/lang/es/).
   módulo `docs/modulos/percepcion.md` y **ADR 0008**.
 - **Diario de eventos** (`ampa/perception/journal.py`, JSONL) y comando
   `ampa diario`: persiste los eventos marcados para guardar (cubre el pendiente
-  «logs» de la Fase 2). +5 pruebas (36 en total).
+  «logs» de la Fase 2). +5 pruebas.
+- **Escriba seguro** (`ampa/scribe/`) y comandos `ampa escribir` / `ampa restaurar`:
+  escritura atómica y portable con respaldo previo, *rollback*, modo simulación
+  (`--simular`) y bloqueo por riesgo alto (`--forzar`). Módulo
+  `docs/modulos/escriba.md` y **ADR 0009**. +8 pruebas (**44** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.

@@ -22,7 +22,7 @@ pueda interpretar, recuperar y auditar (Concepto Maestro §5 y §7).
 - Persiste en un **diario** (JSONL) los eventos marcados para guardar (`journal`).
 
 **No hace:**
-- No ejecuta acciones ni escribe archivos (eso será el módulo `scribe`).
+- No ejecuta acciones ni escribe archivos (eso lo hace el módulo `scribe`).
 - No accede a memoria ni al modelo; solo **estructura** la entrada.
 - No usa ML todavía (clasificador por reglas; ver ADR 0008).
 

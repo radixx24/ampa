@@ -29,3 +29,4 @@ Cada ADR sigue esta plantilla:
 | [0006](0006-memoria-dinamica-simulaciones.md) | Memoria dinámica y simulaciones aleatorias | Aceptado |
 | [0007](0007-portabilidad.md) | Portabilidad del núcleo (stdlib, pathlib, CMake) | Aceptado |
 | [0008](0008-clasificador-reglas.md) | Clasificador de dominio por reglas antes que ML | Aceptado |
+| [0009](0009-escritura-segura.md) | Escritura segura: atómica, con respaldo y bloqueo por riesgo | Aceptado |

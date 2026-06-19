@@ -7,12 +7,15 @@ Puntos de entrada: el comando ``ampa`` (ver ``pyproject.toml``) o
 from __future__ import annotations
 
 import argparse
+import sys
+from pathlib import Path
 from typing import Optional, Sequence
 
 from .. import __version__
 from ..core import paths as paths_mod
 from ..core import platform_info
 from ..perception import journal, perceive
+from ..scribe import writer as scribe
 
 
 def _cmd_version() -> int:
@@ -69,6 +72,32 @@ def _cmd_diario() -> int:
     return 0
 
 
+def _cmd_escribir(ruta, contenido, desde, riesgo, simular, forzar, sin_respaldo) -> int:
+    if contenido is None and desde is None:
+        print("error: indica --contenido o --desde.", file=sys.stderr)
+        return 2
+    if contenido is None:
+        contenido = (
+            sys.stdin.read() if desde == "-" else Path(desde).read_text(encoding="utf-8")
+        )
+    res = scribe.escribir(
+        ruta,
+        contenido,
+        riesgo=riesgo,
+        simular=simular,
+        forzar=forzar,
+        respaldar=not sin_respaldo,
+    )
+    print(res.resumen())
+    return 0 if (res.escrito or res.simulado) else 1
+
+
+def _cmd_restaurar(ruta, respaldo) -> int:
+    res = scribe.restaurar(ruta, respaldo)
+    print(res.resumen())
+    return 0 if res.escrito else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ampa",
@@ -109,6 +138,52 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     sub.add_parser("diario", help="Muestra los eventos registrados en el diario.")
+
+    p_esc = sub.add_parser(
+        "escribir",
+        help="Escribe un archivo de forma segura (respaldo + simulación).",
+    )
+    p_esc.add_argument("ruta", help="Ruta del archivo a escribir.")
+    grupo = p_esc.add_mutually_exclusive_group()
+    grupo.add_argument("--contenido", default=None, help="Contenido literal a escribir.")
+    grupo.add_argument(
+        "--desde",
+        default=None,
+        help="Lee el contenido de un archivo ('-' = entrada estándar).",
+    )
+    p_esc.add_argument(
+        "--riesgo",
+        choices=("bajo", "medio", "alto"),
+        default="bajo",
+        help="Riesgo operativo; 'alto' bloquea la escritura salvo --forzar.",
+    )
+    p_esc.add_argument(
+        "--simular",
+        action="store_true",
+        help="No toca el disco; describe lo que haría.",
+    )
+    p_esc.add_argument(
+        "--forzar",
+        action="store_true",
+        help="Autoriza la escritura aunque el riesgo sea alto.",
+    )
+    p_esc.add_argument(
+        "--sin-respaldo",
+        action="store_true",
+        dest="sin_respaldo",
+        help="No crea respaldo previo al sobrescribir.",
+    )
+
+    p_rest = sub.add_parser(
+        "restaurar", help="Restaura un archivo desde su respaldo más reciente."
+    )
+    p_rest.add_argument("ruta", help="Ruta del archivo a restaurar.")
+    p_rest.add_argument(
+        "--respaldo",
+        default=None,
+        help="Respaldo específico (por defecto, el más reciente).",
+    )
+
     return parser
 
 
@@ -127,6 +202,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return _cmd_percibir(args.texto, args.tipo, args.archivos, args.registrar)
     if args.comando == "diario":
         return _cmd_diario()
+    if args.comando == "escribir":
+        return _cmd_escribir(
+            args.ruta,
+            args.contenido,
+            args.desde,
+            args.riesgo,
+            args.simular,
+            args.forzar,
+            args.sin_respaldo,
+        )
+    if args.comando == "restaurar":
+        return _cmd_restaurar(args.ruta, args.respaldo)
 
     # Sin subcomando: mostrar la ayuda.
     parser.print_help()

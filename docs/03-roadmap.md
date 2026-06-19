@@ -6,7 +6,7 @@
 ## Fase 0 — Concepto rector ✅
 
 - [x] Definición, límites y arquitectura (`concepto-maestro.md` v0.2)
-- [x] Decisiones registradas (ADR 0001–0008)
+- [x] Decisiones registradas (ADR 0001–0009)
 
 ## Fase 1 — Documentación base ✅
 
@@ -35,12 +35,12 @@
 - [ ] Modo diagnóstico
 - [ ] Integración con el motor (`llama.cpp`)
 
-## Fase 5 — Escriba seguro ⏳
+## Fase 5 — Escriba seguro 🟡 (núcleo)
 
-- [ ] Escritura multiplataforma (`pathlib`)
-- [ ] **Backups** automáticos antes de cada cambio
-- [ ] Modo simulación y bloqueo por riesgo alto
-- [ ] Bitácora de cambios
+- [x] Escritura multiplataforma y **atómica** (`pathlib` + `os.replace`) → `ampa/scribe/`
+- [x] **Backups** automáticos antes de cada cambio (+ `restaurar` / `ampa restaurar`)
+- [x] Modo simulación (`--simular`) y bloqueo por riesgo alto (`--forzar` para autorizar)
+- [ ] Bitácora de cambios (los resultados ya son auditables vía `ResultadoEscritura`)
 
 ## Fase 6 — Dominio químico-filosófico ⏳
 
