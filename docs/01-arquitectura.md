@@ -106,7 +106,7 @@ ampa/
 ├── ampa/                          ← PISTA A: el sistema (paquete Python)
 │   ├── core/        ✅            ← portabilidad: plataforma + rutas
 │   ├── cli/         ✅            ← interfaz de línea de comandos
-│   ├── perception/  ⏳            ← capa de percepción (eventos)
+│   ├── perception/  ✅            ← capa de percepción (eventos + clasificador)
 │   ├── knowledge/   ⏳            ← ingesta de apuntes (RAG)
 │   ├── memory/      ⏳            ← memoria dinámica persistente
 │   ├── scribe/      ⏳            ← escritura multiplataforma + backups

@@ -12,6 +12,7 @@ from typing import Optional, Sequence
 from .. import __version__
 from ..core import paths as paths_mod
 from ..core import platform_info
+from ..perception import perceive
 
 
 def _cmd_version() -> int:
@@ -44,6 +45,12 @@ def _cmd_paths(crear: bool) -> int:
     return 0
 
 
+def _cmd_percibir(texto, tipo, archivos) -> int:
+    evento = perceive(texto, tipo=tipo, archivos=archivos)
+    print(evento.as_yaml(), end="")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ampa",
@@ -60,6 +67,23 @@ def build_parser() -> argparse.ArgumentParser:
     p_paths.add_argument(
         "--create", action="store_true", help="Crea las carpetas en disco."
     )
+
+    p_perc = sub.add_parser(
+        "percibir", help="Estructura una entrada como evento de percepción."
+    )
+    p_perc.add_argument("texto", help="El texto a percibir.")
+    p_perc.add_argument(
+        "--tipo",
+        default=None,
+        help="Tipo de evento (pregunta, comando, correccion, error, decision).",
+    )
+    p_perc.add_argument(
+        "--archivo",
+        action="append",
+        default=None,
+        dest="archivos",
+        help="Archivo relacionado (se puede repetir).",
+    )
     return parser
 
 
@@ -74,6 +98,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return _cmd_version()
     if args.comando == "paths":
         return _cmd_paths(args.create)
+    if args.comando == "percibir":
+        return _cmd_percibir(args.texto, args.tipo, args.archivos)
 
     # Sin subcomando: mostrar la ayuda.
     parser.print_help()

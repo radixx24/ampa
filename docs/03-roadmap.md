@@ -1,70 +1,66 @@
 # 03 — Roadmap
 
-> Plan por fases. Las dos pistas (sistema y red neuronal) avanzan en paralelo.
-> Marcamos cada hito al completarlo. Resumen de capas en
-> [`concepto-maestro.md`](concepto-maestro.md).
+> Plan por fases **alineado con el Concepto Maestro §19**. La Pista B (red neuronal
+> desde cero) avanza en paralelo. Se marca cada hito al completarlo.
 
-## Fase 0 — Fundación 🚧 (actual)
+## Fase 0 — Concepto rector ✅
 
-- [x] Definir visión y principios (`00-vision.md`)
-- [x] Diseñar la arquitectura (`01-arquitectura.md`)
-- [x] Documento maestro que conjunta todas las ideas (`concepto-maestro.md`)
-- [x] Registrar decisiones (ADR 0001–0006)
-- [x] Glosario y fuentes de conocimiento (química + filosofía)
+- [x] Definición, límites y arquitectura (`concepto-maestro.md` v0.2)
+- [x] Decisiones registradas (ADR 0001–0008)
+
+## Fase 1 — Documentación base ✅
+
+- [x] Arquitectura, carpeta de decisiones, glosario, base de conocimiento
 - [x] `CHANGELOG.md` y `CITATION.cff` (solo autores humanos)
-- [ ] Recoger el contexto del autor (nivel en C++/Python, primeros apuntes)
-- [ ] Definir dependencias y entorno (`requirements`, toolchain C++)
+- [x] Plantillas en uso: `docs/modulos/`, `docs/contratos/`
+- [x] **Núcleo portable** (`ampa/core/`) + base C++ (`cpp/`) — ADR 0007
 
-## Fase 1 — Didáctica: red neuronal desde cero (Pista 2)
+## Fase 2 — Percepción mínima ✅ (base)
 
-- [ ] MLP en Python (NumPy): forward, backprop, entrenamiento
-- [ ] Dataset de patrones simple para validar el aprendizaje
-- [ ] Espejo del MLP en C++
-- [ ] Mini-tokenizer con SentencePiece
-- [ ] Documento educativo paso a paso
+- [x] Contrato de evento §5.2 → `ampa/perception/events.py` + `docs/contratos/evento.md`
+- [x] Clasificador de dominio por reglas (ADR 0008)
+- [x] Evaluación de riesgo operativo y política de memoria (§6.2)
+- [x] Comando `ampa percibir` + 13 pruebas
+- [ ] Registro (logs) de eventos percibidos
 
-## Fase 2 — El modelo respira + RAG de tus apuntes (Pista 1)
+## Fase 3 — Memoria documental ⏳
 
-- [ ] Integrar `llama.cpp` y cargar un modelo 1.7B–3B Q4
-- [ ] CLI mínima: pregunta → respuesta
-- [ ] Benchmark de velocidad real en CPU
-- [ ] Pipeline de ingesta de apuntes → embeddings → vector DB
-- [ ] Recuperación (RAG) conectada al prompt, con **citas**
+- [ ] Ingesta de apuntes: troceo (chunking) y metadatos
+- [ ] Embeddings + índice vectorial
+- [ ] Recuperación contextual con **citas**
 
-## Fase 3 — Memoria dinámica + escriba con backups
+## Fase 4 — CLI funcional ⏳
 
-- [ ] Persistencia de la memoria entre sesiones
-- [ ] Priorización dinámica (relevancia + recencia)
-- [ ] Módulo "escriba" multiplataforma (Windows/Linux)
-- [ ] **Backups** automáticos antes de cada escritura
-- [ ] "Enséñale" algo y que lo recuerde en la siguiente sesión
+- [ ] Preguntas y respuestas con fuentes
+- [ ] Modo diagnóstico
+- [ ] Integración con el motor (`llama.cpp`)
 
-## Fase 4 — Motor de dinamismo (simulaciones aleatorias)
+## Fase 5 — Escriba seguro ⏳
 
-- [ ] Decodificación estocástica controlada (temperatura, top-p)
-- [ ] Muestreo tipo Monte Carlo + auto-consistencia
-- [ ] Escenarios/ejemplos aleatorios para química
-- [ ] **Semilla reproducible** en todo el sistema
+- [ ] Escritura multiplataforma (`pathlib`)
+- [ ] **Backups** automáticos antes de cada cambio
+- [ ] Modo simulación y bloqueo por riesgo alto
+- [ ] Bitácora de cambios
 
-## Fase 5 — Dominios y clasificador
+## Fase 6 — Dominio químico-filosófico ⏳
 
-- [ ] Curar e ingerir base de **química** y **filosofía**
-- [ ] Entrenar el MLP como **clasificador de dominio** (química/filosofía/general)
-- [ ] Conectarlo al orquestador para enrutar la recuperación
-- [ ] Capa epistémica: marcar origen y confianza de cada respuesta
+- [ ] Base curada mínima de química y filosofía
+- [ ] Pruebas por dominio
+- [ ] Capa epistémica: origen y confianza por respuesta
 
-## Fase 6 — Aprendizaje paramétrico (opcional, avanzado)
+## Fase 7 — Evaluación ⏳
 
-- [ ] Consolidador: destilar memoria en adaptadores **LoRA/QLoRA**
-- [ ] Entrenamiento por lotes (modelos pequeños)
-- [ ] Evaluar si mejora frente a solo-RAG, sin degradar capacidades
+- [ ] Banco propio de casos (química y filosofía)
+- [ ] Métricas y detección de regresiones
 
-## Fase 7 — Evaluación y pulido
+## Fase 8 — Adaptación futura ⏳
 
-- [ ] Banco propio de casos (química y filosofía) con respuestas de referencia
-- [ ] Tests y reproducibilidad
-- [ ] Empaquetado e instrucciones de instalación
-- [ ] ¿Interfaz API + web mínima?
+- [ ] LoRA/QLoRA en ciclos controlados (ADR, dataset, pruebas antes/después)
 
-> El orden no es rígido: las fases 1 y 2 pueden ir a la par por ser de pistas
-> distintas.
+## Pista B (paralela) — Red neuronal desde cero ⏳
+
+- [ ] Tokenizer didáctico (SentencePiece)
+- [ ] MLP en NumPy (forward, backprop)
+- [ ] Versión C++ del MLP
+- [ ] Clasificador de dominio entrenado (reemplaza/complementa al de reglas)
+- [ ] Mini-transformer didáctico

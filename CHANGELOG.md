@@ -7,6 +7,10 @@ versionado según [SemVer](https://semver.org/lang/es/).
 ## [No publicado]
 
 ### Añadido
+- **Capa de percepción** (`ampa/perception/`): contrato de evento (§5.2),
+  clasificador de dominio por reglas, evaluación de riesgo y política de memoria.
+- **Comando `ampa percibir`** y 13 pruebas; contrato `docs/contratos/evento.md`,
+  módulo `docs/modulos/percepcion.md` y **ADR 0008**.
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.
