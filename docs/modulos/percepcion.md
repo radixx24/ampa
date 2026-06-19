@@ -19,6 +19,7 @@ pueda interpretar, recuperar y auditar (Concepto Maestro §5 y §7).
 - Evalúa el **riesgo operativo** (bajo / medio / alto).
 - Decide si el evento debe **guardarse en memoria** (evita ruido, §6.2).
 - Produce un `Evento` conforme al contrato §5.2.
+- Persiste en un **diario** (JSONL) los eventos marcados para guardar (`journal`).
 
 **No hace:**
 - No ejecuta acciones ni escribe archivos (eso será el módulo `scribe`).
@@ -74,5 +75,8 @@ pueda interpretar, recuperar y auditar (Concepto Maestro §5 y §7).
 
 - Reemplazar/complementar el clasificador por la red neuronal (Pista B).
 - Ampliar los léxicos de dominio.
-- Persistir los eventos con `guardar_en_memoria=true` (módulo `memory`).
-- Registrar (logs) los eventos percibidos.
+- La memoria documental (Fase 3) consumirá el diario de eventos como entrada.
+
+> **Hecho:** el **diario de eventos** (`journal.py`) ya persiste en JSONL los eventos
+> marcados para guardar, y `ampa diario` los lista. Cubre el pendiente de «logs» de
+> la Fase 2.

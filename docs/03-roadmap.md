@@ -21,7 +21,7 @@
 - [x] Clasificador de dominio por reglas (ADR 0008)
 - [x] Evaluación de riesgo operativo y política de memoria (§6.2)
 - [x] Comando `ampa percibir` + 13 pruebas
-- [ ] Registro (logs) de eventos percibidos
+- [x] Registro (logs) de eventos percibidos (`journal` JSONL + `ampa diario`)
 
 ## Fase 3 — Memoria documental ⏳
 

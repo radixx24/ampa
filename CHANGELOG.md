@@ -11,6 +11,9 @@ versionado según [SemVer](https://semver.org/lang/es/).
   clasificador de dominio por reglas, evaluación de riesgo y política de memoria.
 - **Comando `ampa percibir`** y 13 pruebas; contrato `docs/contratos/evento.md`,
   módulo `docs/modulos/percepcion.md` y **ADR 0008**.
+- **Diario de eventos** (`ampa/perception/journal.py`, JSONL) y comando
+  `ampa diario`: persiste los eventos marcados para guardar (cubre el pendiente
+  «logs» de la Fase 2). +5 pruebas (36 en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.
