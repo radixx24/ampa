@@ -14,6 +14,14 @@ from typing import Optional, Sequence
 from .. import __version__
 from ..core import paths as paths_mod
 from ..core import platform_info
+from ..memory import (
+    cargar_fragmentos,
+    fuentes,
+    ingerir,
+    recuperar,
+    reiniciar,
+    ruta_memoria,
+)
 from ..perception import journal, perceive
 from ..scribe import writer as scribe
 
@@ -96,6 +104,51 @@ def _cmd_restaurar(ruta, respaldo) -> int:
     res = scribe.restaurar(ruta, respaldo)
     print(res.resumen())
     return 0 if res.escrito else 1
+
+
+def _cmd_recordar(
+    texto, desde, fuente, max_palabras, solapamiento, reiniciar_, sin_clasificar
+) -> int:
+    if texto is None and desde is None:
+        print("error: indica --texto o --desde.", file=sys.stderr)
+        return 2
+    if reiniciar_:
+        reiniciar()
+    frags = ingerir(
+        texto=texto,
+        ruta_fuente=Path(desde) if desde else None,
+        fuente=fuente,
+        clasificar=not sin_clasificar,
+        max_palabras=max_palabras,
+        solapamiento=solapamiento,
+    )
+    print(f"Ingeridos {len(frags)} fragmentos en {ruta_memoria()}")
+    return 0
+
+
+def _cmd_consultar(consulta, k) -> int:
+    resultados = recuperar(consulta, k)
+    if not resultados:
+        print("Sin coincidencias en la memoria.")
+        return 0
+    for n, resultado in enumerate(resultados, 1):
+        fragmento = resultado.fragmento
+        extracto = " ".join(fragmento.texto.split())
+        if len(extracto) > 160:
+            extracto = extracto[:157] + "..."
+        print(f"{n}. {resultado.cita()} ({fragmento.dominio}, score {resultado.score})")
+        print(f"   {extracto}")
+    return 0
+
+
+def _cmd_memoria() -> int:
+    frags = cargar_fragmentos()
+    lista_fuentes = fuentes()
+    print(f"Memoria: {ruta_memoria()}")
+    print(f"Fragmentos: {len(frags)} · Fuentes: {len(lista_fuentes)}")
+    for nombre in lista_fuentes:
+        print(f"  - {nombre}")
+    return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -184,6 +237,46 @@ def build_parser() -> argparse.ArgumentParser:
         help="Respaldo específico (por defecto, el más reciente).",
     )
 
+    p_rec = sub.add_parser("recordar", help="Ingiere apuntes en la memoria documental.")
+    grupo_rec = p_rec.add_mutually_exclusive_group()
+    grupo_rec.add_argument("--texto", default=None, help="Texto a recordar.")
+    grupo_rec.add_argument("--desde", default=None, help="Archivo de apuntes a ingerir.")
+    p_rec.add_argument(
+        "--fuente", default=None, help="Nombre de la fuente (aparece en las citas)."
+    )
+    p_rec.add_argument(
+        "--max-palabras",
+        type=int,
+        default=120,
+        dest="max_palabras",
+        help="Tamaño máximo de cada fragmento, en palabras.",
+    )
+    p_rec.add_argument(
+        "--solapamiento",
+        type=int,
+        default=20,
+        help="Solapamiento entre fragmentos largos, en palabras.",
+    )
+    p_rec.add_argument(
+        "--reiniciar", action="store_true", help="Vacía la memoria antes de ingerir."
+    )
+    p_rec.add_argument(
+        "--sin-clasificar",
+        action="store_true",
+        dest="sin_clasificar",
+        help="No etiqueta el dominio de cada fragmento.",
+    )
+
+    p_con = sub.add_parser(
+        "consultar", help="Recupera fragmentos relevantes de la memoria, con citas."
+    )
+    p_con.add_argument("consulta", help="La consulta o pregunta.")
+    p_con.add_argument(
+        "-k", type=int, default=5, help="Número de fragmentos a devolver."
+    )
+
+    sub.add_parser("memoria", help="Muestra el estado de la memoria documental.")
+
     return parser
 
 
@@ -214,6 +307,20 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         )
     if args.comando == "restaurar":
         return _cmd_restaurar(args.ruta, args.respaldo)
+    if args.comando == "recordar":
+        return _cmd_recordar(
+            args.texto,
+            args.desde,
+            args.fuente,
+            args.max_palabras,
+            args.solapamiento,
+            args.reiniciar,
+            args.sin_clasificar,
+        )
+    if args.comando == "consultar":
+        return _cmd_consultar(args.consulta, args.k)
+    if args.comando == "memoria":
+        return _cmd_memoria()
 
     # Sin subcomando: mostrar la ayuda.
     parser.print_help()

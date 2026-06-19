@@ -18,6 +18,11 @@ versionado según [SemVer](https://semver.org/lang/es/).
   escritura atómica y portable con respaldo previo, *rollback*, modo simulación
   (`--simular`) y bloqueo por riesgo alto (`--forzar`). Módulo
   `docs/modulos/escriba.md` y **ADR 0009**. +8 pruebas (**44** en total).
+- **Memoria documental** (`ampa/memory/`): ingesta de apuntes con troceo
+  (chunking) y etiquetado de dominio, y **recuperación con citas** mediante
+  ranking léxico **BM25** (sin dependencias). Comandos `ampa recordar`,
+  `ampa consultar` y `ampa memoria`. Módulo `docs/modulos/memoria.md` y
+  **ADR 0010**. +6 pruebas (**50** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.

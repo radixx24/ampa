@@ -30,3 +30,5 @@ Cada ADR sigue esta plantilla:
 | [0007](0007-portabilidad.md) | Portabilidad del núcleo (stdlib, pathlib, CMake) | Aceptado |
 | [0008](0008-clasificador-reglas.md) | Clasificador de dominio por reglas antes que ML | Aceptado |
 | [0009](0009-escritura-segura.md) | Escritura segura: atómica, con respaldo y bloqueo por riesgo | Aceptado |
+| [0010](0010-recuperacion-lexica.md) | Recuperación léxica (BM25) portable antes que embeddings | Aceptado |
+| [0010](0010-recuperacion-lexica.md) | Recuperación léxica (BM25) portable antes que embeddings | Aceptado |

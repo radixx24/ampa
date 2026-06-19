@@ -6,7 +6,7 @@
 ## Fase 0 — Concepto rector ✅
 
 - [x] Definición, límites y arquitectura (`concepto-maestro.md` v0.2)
-- [x] Decisiones registradas (ADR 0001–0009)
+- [x] Decisiones registradas (ADR 0001–0010)
 
 ## Fase 1 — Documentación base ✅
 
@@ -23,11 +23,11 @@
 - [x] Comando `ampa percibir` + 13 pruebas
 - [x] Registro (logs) de eventos percibidos (`journal` JSONL + `ampa diario`)
 
-## Fase 3 — Memoria documental ⏳
+## Fase 3 — Memoria documental 🟡 (núcleo léxico)
 
-- [ ] Ingesta de apuntes: troceo (chunking) y metadatos
-- [ ] Embeddings + índice vectorial
-- [ ] Recuperación contextual con **citas**
+- [x] Ingesta de apuntes: troceo (chunking) y metadatos → `ampa/memory/` + `ampa recordar`
+- [x] Recuperación contextual con **citas** (BM25 portable, ADR 0010) → `ampa consultar`
+- [ ] Embeddings + índice vectorial (segunda iteración; complementa a BM25)
 
 ## Fase 4 — CLI funcional ⏳
 
