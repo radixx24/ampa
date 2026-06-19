@@ -7,21 +7,23 @@ versionado según [SemVer](https://semver.org/lang/es/).
 ## [No publicado]
 
 ### Añadido
-- Documento maestro (`docs/concepto-maestro.md`) que conjunta y hace congruentes
-  todas las ideas del proyecto.
-- ADR 0004: cambio de dominios a **química y filosofía**.
-- ADR 0005: apuntes propios como fuente principal (90/10) y módulo "escriba"
-  multiplataforma con backups.
-- ADR 0006: memoria dinámica persistente y motor de simulaciones aleatorias
-  reproducibles.
-- `CITATION.cff` (solo autores humanos; sin coautoría de IA).
-- Este `CHANGELOG.md`.
+- **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
+  y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
+- **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.
+- **Pruebas** con `unittest` (18 casos): plataforma, rutas (Windows/macOS/Linux
+  simulados) y CLI.
+- **Base C++ portable** (`cpp/`): proyecto CMake y sonda `ampa-probe` con
+  aleatoriedad reproducible (`std::mt19937_64`).
+- `pyproject.toml`: empaquetado, *entry point* `ampa`, núcleo sin dependencias.
+- Documento de módulo `docs/modulos/core.md` y **ADR 0007** (portabilidad).
+- ADR 0004–0006 (dominios, apuntes/escriba, memoria/simulaciones), `CITATION.cff`.
 
 ### Cambiado
-- Dominios del proyecto: de (medicina, psicología, filosofía) a
-  **(química/ciencia, filosofía)**.
-- Visión, arquitectura, roadmap, glosario y base de conocimiento actualizados para
-  reflejar los nuevos dominios y capacidades.
+- **Concepto Maestro actualizado a v0.2**: ejes lenguaje/percepción/memoria, capa de
+  percepción, ciclo percepción‑memoria‑acción, sistema de documentación controlada
+  y regla final de control.
+- Dominios del proyecto: a **química** (eje científico) y **filosofía** (lente).
+- Visión, arquitectura, roadmap, glosario y base de conocimiento alineados.
 
 ## [0.0.1] - 2026-06-18
 

@@ -27,3 +27,4 @@ Cada ADR sigue esta plantilla:
 | [0004](0004-cambio-dominios.md) | Cambio de dominios: química y filosofía | Aceptado |
 | [0005](0005-apuntes-propios-escritura-backups.md) | Apuntes propios como fuente; escritura con backups | Aceptado |
 | [0006](0006-memoria-dinamica-simulaciones.md) | Memoria dinámica y simulaciones aleatorias | Aceptado |
+| [0007](0007-portabilidad.md) | Portabilidad del núcleo (stdlib, pathlib, CMake) | Aceptado |

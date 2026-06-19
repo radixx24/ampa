@@ -18,6 +18,12 @@
 Con un modelo de 1.7B–3B en Q4 (~1–4 GB) más embeddings y vector DB, el consumo
 total queda holgado por debajo de los 16 GB.
 
+> **Nota de alineación.** El detalle conceptual de la **capa de percepción**, el
+> **ciclo percepción‑memoria‑acción** y el **sistema de documentación controlada**
+> vive en el documento rector [`concepto-maestro.md`](concepto-maestro.md) (§5–§15).
+> Esta arquitectura se irá alineando módulo a módulo. El **núcleo portable**
+> (`ampa/core/`) ya está implementado y probado.
+
 ## Diagrama de alto nivel
 
 ```
@@ -51,8 +57,9 @@ total queda holgado por debajo de los 16 GB.
 ## Flujo de una consulta (paso a paso)
 
 1. Escribes una pregunta (o ingieres apuntes nuevos) en la CLI.
-2. El **clasificador de dominio** (nuestra red neuronal) decide: química, filosofía
-   o general.
+2. La **capa de percepción** estructura la entrada (ver Concepto Maestro §5) y el
+   **clasificador de dominio** la enruta: química, filosofía, general,
+   documentación u operación técnica.
 3. Se generan **embeddings** de la pregunta y se recuperan los fragmentos más
    relevantes de la **memoria dinámica** (tus apuntes + la base curada).
 4. El **motor de dinamismo** decide cuánta variación aplicar (y con qué semilla).
@@ -90,25 +97,27 @@ de dominio real del sistema.
 
 ```
 ampa/
-├── README.md · CHANGELOG.md · CITATION.cff
-├── docs/                       ← toda la documentación (docs-as-code)
-│   ├── concepto-maestro.md     ← visión unificada
+├── README.md · CHANGELOG.md · CITATION.cff · pyproject.toml
+├── docs/                          ← documentación (docs-as-code)
+│   ├── concepto-maestro.md        ← documento rector (v0.2)
 │   ├── 00-vision.md · 01-arquitectura.md · ...
-│   └── 02-decisiones/          ← ADRs
-├── ampa/                       ← PISTA 1: el sistema (paquete Python)
-│   ├── engine/                 ← wrapper sobre llama.cpp
-│   ├── knowledge/              ← ingesta de apuntes: troceo, embeddings
-│   ├── memory/                 ← memoria dinámica persistente (+ ganchos LoRA)
-│   ├── scribe/                 ← escritura multiplataforma + backups
-│   ├── dynamism/               ← motor de simulaciones aleatorias
-│   ├── domains/                ← uso del clasificador de dominio
-│   └── cli/                    ← interfaz de línea de comandos
-├── nn/                         ← PISTA 2: red neuronal desde cero
-│   ├── python/                 ← MLP en NumPy + tokenizer/transformer didáctico
-│   └── cpp/                    ← el mismo MLP en C++
-├── models/                     ← modelos GGUF (no se versionan)
-├── data/                       ← apuntes, base vectorial y backups (no se versionan)
-└── experiments/                ← pruebas y evaluación
+│   ├── 02-decisiones/             ← ADRs
+│   └── modulos/                   ← documentación por módulo
+├── ampa/                          ← PISTA A: el sistema (paquete Python)
+│   ├── core/        ✅            ← portabilidad: plataforma + rutas
+│   ├── cli/         ✅            ← interfaz de línea de comandos
+│   ├── perception/  ⏳            ← capa de percepción (eventos)
+│   ├── knowledge/   ⏳            ← ingesta de apuntes (RAG)
+│   ├── memory/      ⏳            ← memoria dinámica persistente
+│   ├── scribe/      ⏳            ← escritura multiplataforma + backups
+│   ├── dynamism/    ⏳            ← simulaciones aleatorias
+│   ├── domains/     ⏳            ← clasificador de dominio
+│   └── engine/      ⏳            ← wrapper sobre llama.cpp
+├── cpp/             ✅            ← C++ portable (CMake): sonda; futuro runtime/NN
+├── nn/              ⏳            ← PISTA B: red neuronal desde cero (Python)
+├── tests/           ✅            ← pruebas (unittest, sin dependencias)
+├── models/                        ← modelos GGUF (no se versionan)
+└── data/                          ← apuntes, memoria y backups (no se versionan)
 ```
 
 > Las carpetas de código se crearán al iniciar cada módulo, documentando el porqué.
