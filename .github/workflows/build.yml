@@ -1,0 +1,47 @@
+name: Construir ejecutables
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Compilar frontend
+        working-directory: frontend
+        run: |
+          npm install
+          npm run build
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Pruebas
+        run: python -m unittest discover -s tests -t .
+
+      - name: Construir ejecutable
+        run: |
+          python -m pip install --upgrade pip pyinstaller
+          python packaging/build_exe.py
+
+      - name: Subir artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: ampakadabra-${{ matrix.os }}
+          path: dist_exe/*
