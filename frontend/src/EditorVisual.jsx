@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "./api.js";
 import Visor3D from "./Visor3D.jsx";
+import ReaccionAnimada from "./ReaccionAnimada.jsx";
 
 const PALETA = ["C", "H", "O", "N", "S", "Cl", "P", "F"];
 const COLOR = {
@@ -91,6 +92,7 @@ export default function EditorVisual() {
   const [error, setError] = useState("");
   const [guardados, setGuardados] = useState([]);
   const [mol3d, setMol3d] = useState(null);
+  const [animMol, setAnimMol] = useState(null);
 
   const cargar = () => api.listarCompuestos().then(setGuardados).catch(() => {});
   useEffect(() => { cargar(); }, []);
@@ -186,6 +188,11 @@ export default function EditorVisual() {
     img.src = fuente;
   }
 
+  const combustible =
+    atomos.some((a) => a.el === "C") &&
+    atomos.some((a) => a.el === "H") &&
+    atomos.every((a) => ["C", "H", "O"].includes(a.el));
+
   return (
     <section className="card">
       <h3>Editor de enlaces de carbono</h3>
@@ -271,6 +278,7 @@ export default function EditorVisual() {
         <input className="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="nombre (opcional)" />
         <button onClick={analizar} disabled={!atomos.length}>Analizar</button>
         <button className="sec" onClick={() => setMol3d(molecula())} disabled={!atomos.length}>🧊 Ver en 3D</button>
+        <button className="sec" onClick={() => setAnimMol(molecula())} disabled={!combustible} title={combustible ? "" : "Necesita C y H"}>🎬 Combustión</button>
       </div>
       <div className="row">
         <button className="sec" onClick={guardar} disabled={!atomos.length}>Guardar</button>
@@ -279,6 +287,7 @@ export default function EditorVisual() {
       </div>
       {error && <p className="err">{error}</p>}
       {mol3d && <Visor3D molecula={mol3d} onCerrar={() => setMol3d(null)} />}
+      {animMol && <ReaccionAnimada molecula={animMol} onCerrar={() => setAnimMol(null)} />}
       {res && (
         <div className="result">
           <p className="formula"><b>{res.formula}</b> · {res.masa_molar} g/mol</p>

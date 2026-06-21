@@ -38,7 +38,7 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
 - `EntidadQuimica`: `tipo`, `nombre`, `formula`, `simbolo`, `numero_atomico`,
   `composicion`, `masa_molar`, `texto`.
 - `Elemento` (tabla periódica): `simbolo`, `z`, `nombre`, `masa`, `periodo`,
-  `grupo`, `categoria`; `tabla()` los devuelve todos y `ampa quimica --tabla` los vuelca.
+  `grupo`, `categoria`, `radio` (covalente, Å); `tabla()` los devuelve todos.
 - `Molecula` (átomos + enlaces): `formula()`, `composicion()`, `masa_molar()`,
   `to_dict()`; se persiste con `guardar_compuesto` / `cargar_compuestos`.
 - `grupos_funcionales(mol)` → lista de grupos; `reacciones(mol)` → lista de

@@ -5,10 +5,10 @@ const COLOR = {
   H: "#dfe3ea", C: "#3a4150", O: "#e06c75", N: "#61afef",
   S: "#e5c07b", Cl: "#98c379", P: "#d19a66", F: "#56b6c2", Br: "#c0744a",
 };
-const RADIO = { H: 11, C: 17, O: 16, N: 16, S: 19, Cl: 19, P: 19, F: 14, Br: 20 };
 const TEXTO_OSCURO = new Set(["H", "F", "S", "Cl"]);
 const colorDe = (e) => COLOR[e] || "#7a8290";
-const radioDe = (e) => RADIO[e] || 15;
+const ESCALA = 64; // px por ångström de posición
+const ESCALA_R = 26; // px por ångström de radio atómico
 
 function oscurecer(hex, f = 0.42) {
   const n = parseInt(hex.slice(1), 16);
@@ -89,26 +89,42 @@ function dibujar(ctx, canvas, geo, rotX, rotY, err) {
     return;
   }
   const cx = Math.cos(rotX), sx = Math.sin(rotX), cy = Math.cos(rotY), sy = Math.sin(rotY);
-  const escala = 64;
   const pts = geo.atomos.map((a) => {
     const x1 = a.x * cy - a.z * sy;
     const z1 = a.x * sy + a.z * cy;
     const y1 = a.y * cx - z1 * sx;
     const z2 = a.y * sx + z1 * cx;
     const persp = 5 / (5 + z2);
-    return { el: a.el, sx: W / 2 + x1 * escala * persp, sy: H / 2 + y1 * escala * persp, z: z2, persp };
+    return {
+      el: a.el, radio: a.radio || 0.7, z: z2, persp,
+      sx: W / 2 + x1 * ESCALA * persp, sy: H / 2 + y1 * ESCALA * persp,
+    };
   });
+
+  // Enlaces: dobles/triples como líneas paralelas (perpendicular en 2D proyectado).
   ctx.lineCap = "round";
-  (geo.enlaces || []).forEach(([a, b]) => {
+  ctx.strokeStyle = "#7e889a";
+  (geo.enlaces || []).forEach(([a, b, orden]) => {
     const A = pts[a], B = pts[b];
     if (!A || !B) return;
-    ctx.strokeStyle = "#7e889a";
-    ctx.lineWidth = 5 * ((A.persp + B.persp) / 2);
-    ctx.beginPath(); ctx.moveTo(A.sx, A.sy); ctx.lineTo(B.sx, B.sy); ctx.stroke();
+    const dx = B.sx - A.sx, dy = B.sy - A.sy;
+    const len = Math.hypot(dx, dy) || 1;
+    const ox = -dy / len, oy = dx / len;
+    const offs = orden === 2 ? [-3.2, 3.2] : orden === 3 ? [-5.5, 0, 5.5] : [0];
+    const w = (orden > 1 ? 3.4 : 4.6) * ((A.persp + B.persp) / 2);
+    ctx.lineWidth = w;
+    offs.forEach((o) => {
+      ctx.beginPath();
+      ctx.moveTo(A.sx + ox * o, A.sy + oy * o);
+      ctx.lineTo(B.sx + ox * o, B.sy + oy * o);
+      ctx.stroke();
+    });
   });
+
+  // Átomos: del más lejano al más cercano, tamaño por radio covalente.
   pts.map((_, i) => i).sort((i, j) => pts[i].z - pts[j].z).forEach((i) => {
     const p = pts[i];
-    const r = radioDe(p.el) * p.persp;
+    const r = Math.max(5, p.radio * ESCALA_R * p.persp);
     const col = colorDe(p.el);
     const grad = ctx.createRadialGradient(p.sx - r * 0.35, p.sy - r * 0.35, r * 0.1, p.sx, p.sy, r);
     grad.addColorStop(0, "#ffffff");
@@ -117,7 +133,7 @@ function dibujar(ctx, canvas, geo, rotX, rotY, err) {
     ctx.fillStyle = grad;
     ctx.beginPath(); ctx.arc(p.sx, p.sy, r, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = TEXTO_OSCURO.has(p.el) ? "#1a1f27" : "#fff";
-    ctx.font = `700 ${Math.max(9, r * 0.82)}px sans-serif`;
+    ctx.font = `700 ${Math.max(8, r * 0.8)}px sans-serif`;
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.fillText(p.el, p.sx, p.sy);
   });

@@ -61,7 +61,7 @@ class TestApi(unittest.TestCase):
         status, cuerpo = manejar("POST", "/api/quimica/geometria", ETANOL)
         self.assertEqual(status, 200)
         self.assertEqual(len(cuerpo["atomos"]), 9)
-        self.assertEqual(set(cuerpo["atomos"][0]), {"el", "x", "y", "z"})
+        self.assertEqual(set(cuerpo["atomos"][0]), {"el", "x", "y", "z", "radio"})
 
 
 class TestEstatico(unittest.TestCase):

@@ -172,5 +172,9 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .visor-top span { display: flex; gap: 6px; }
 .visor-top button { padding: 5px 10px; font-size: 12px; }
 .canvas3d { display: block; width: 100%; height: auto; touch-action: none; cursor: grab; }
+.ecuacion {
+  text-align: center; font-family: ui-monospace, Menlo, monospace; font-size: 15px;
+  color: var(--acento); margin: 0; padding: 10px; border-top: 1px solid var(--linea);
+}
 
 .pie { text-align: center; color: var(--suave); font-size: 12px; margin-top: 26px; }

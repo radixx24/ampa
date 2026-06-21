@@ -10,7 +10,7 @@ class TestGeometria(unittest.TestCase):
     def test_una_coordenada_por_atomo(self):
         g = geometria_3d(Molecula("agua", ["O", "H", "H"], [(0, 1, 1), (0, 2, 1)]))
         self.assertEqual(len(g), 3)
-        self.assertEqual(set(g[0]), {"el", "x", "y", "z"})
+        self.assertEqual(set(g[0]), {"el", "x", "y", "z", "radio"})
 
     def test_determinista(self):
         m = Molecula("co2", ["C", "O", "O"], [(0, 1, 2), (0, 2, 2)])

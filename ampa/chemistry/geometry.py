@@ -11,9 +11,9 @@ import math
 import random
 from typing import Dict, List
 
+from .elements import ELEMENTOS
 from .molecules import Molecula
 
-_LONGITUD = 1.5  # longitud de reposo de un enlace
 _REPULSION = 2.0
 _PASO = 0.1
 
@@ -27,6 +27,8 @@ def geometria_3d(
         return []
     rnd = random.Random(semilla)
     pos = [[rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.uniform(-1, 1)] for _ in range(n)]
+    # Longitud de reposo de cada enlace ≈ suma de radios covalentes (Å).
+    radios = [ELEMENTOS[a].radio if a in ELEMENTOS else 0.7 for a in mol.atomos]
 
     for _ in range(iteraciones):
         fuerza = [[0.0, 0.0, 0.0] for _ in range(n)]
@@ -52,7 +54,7 @@ def geometria_3d(
             dy = pos[b][1] - pos[a][1]
             dz = pos[b][2] - pos[a][2]
             d = math.sqrt(dx * dx + dy * dy + dz * dz) + 1e-6
-            f = (d - _LONGITUD) * 0.5
+            f = (d - (radios[a] + radios[b])) * 0.5
             ux, uy, uz = dx / d, dy / d, dz / d
             fuerza[a][0] += f * ux
             fuerza[a][1] += f * uy
@@ -74,6 +76,7 @@ def geometria_3d(
             "x": round(pos[i][0] - cx, 3),
             "y": round(pos[i][1] - cy, 3),
             "z": round(pos[i][2] - cz, 3),
+            "radio": round(radios[i], 3),
         }
         for i in range(n)
     ]

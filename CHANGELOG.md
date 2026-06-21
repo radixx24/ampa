@@ -91,6 +91,13 @@ versionado según [SemVer](https://semver.org/lang/es/).
   **exportar PNG** de la molécula.
 - **CI** (`.github/workflows/build.yml`): compila el frontend, corre las pruebas y
   genera el **ejecutable para Windows, macOS y Linux** en cada tag `v*`.
+- **Visor 3D mejorado**: enlaces **dobles/triples** (líneas paralelas) y tamaño de
+  átomo por **radio covalente real** (118 elementos, Cordero et al.); la geometría
+  usa longitudes de enlace ≈ suma de radios.
+- **🎬 Animación de combustión**: los átomos se **reorganizan** de reactivos a
+  productos (conservación de la materia) con la ecuación balanceada en vivo.
+- **Documentación a fondo**: `README.md` maestro (qué hace cada cosa, para qué,
+  cómo actúa y las consideraciones) y módulo `docs/modulos/frontend.md`.
 - **`ampa ampakadabra`** ✨: un solo comando que **conjura web + API** — compila el
   frontend si hace falta, lo sirve junto a la API desde el **mismo servidor** (un
   artefacto portable) y abre el navegador. La API sirve el build de React con
