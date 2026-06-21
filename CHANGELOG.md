@@ -28,6 +28,11 @@ versionado según [SemVer](https://semver.org/lang/es/).
   **extractiva y citada**, honesta cuando no hay evidencia (no inventa). Incluye
   filtrado de palabras vacías en la recuperación. Módulo
   `docs/modulos/respuesta.md` y **ADR 0011**. +5 pruebas (**55** en total).
+- **Ciclo percepción → memoria → acción** (`ampa/cycle/`) y comando `ampa ciclo`:
+  percibe, recupera contexto citado y **propone** una escritura segura; con
+  `--ejecutar` recuerda (diario + memoria) y escribe con respaldo bajo la puerta
+  de riesgo (`--forzar`). Módulo `docs/modulos/ciclo.md` y **ADR 0012**.
+  +4 pruebas (**59** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.

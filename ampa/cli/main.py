@@ -15,6 +15,7 @@ from .. import __version__
 from ..answer import responder
 from ..core import paths as paths_mod
 from ..core import platform_info
+from ..cycle import ciclo
 from ..memory import (
     cargar_fragmentos,
     fuentes,
@@ -161,6 +162,21 @@ def _cmd_responder(consulta, k, detalle) -> int:
     return 0
 
 
+def _cmd_ciclo(entrada, destino, k, ejecutar, forzar, sin_registro) -> int:
+    resultado = ciclo(
+        entrada,
+        destino=Path(destino) if destino else None,
+        k=k,
+        ejecutar=ejecutar,
+        forzar=forzar,
+        registrar=not sin_registro,
+    )
+    print(resultado.resumen())
+    if not ejecutar:
+        print("\n(propuesta — usa --ejecutar para aplicar la escritura)")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ampa",
@@ -300,6 +316,33 @@ def build_parser() -> argparse.ArgumentParser:
         help="Muestra el diagnóstico (percepción de la consulta + scores).",
     )
 
+    p_ciclo = sub.add_parser(
+        "ciclo", help="Ejecuta el ciclo percepción → memoria → acción."
+    )
+    p_ciclo.add_argument("entrada", help="La observación o entrada a procesar.")
+    p_ciclo.add_argument(
+        "--destino", default=None, help="Archivo donde anotar (por defecto, data/bitacora.md)."
+    )
+    p_ciclo.add_argument(
+        "-k", type=int, default=3, help="Fragmentos de contexto a recuperar."
+    )
+    p_ciclo.add_argument(
+        "--ejecutar",
+        action="store_true",
+        help="Aplica de verdad: recuerda la observación y escribe con respaldo.",
+    )
+    p_ciclo.add_argument(
+        "--forzar",
+        action="store_true",
+        help="Autoriza la escritura aunque el riesgo sea alto.",
+    )
+    p_ciclo.add_argument(
+        "--sin-registro",
+        action="store_true",
+        dest="sin_registro",
+        help="No recuerda la observación (ni diario ni memoria).",
+    )
+
     return parser
 
 
@@ -346,6 +389,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return _cmd_memoria()
     if args.comando == "responder":
         return _cmd_responder(args.consulta, args.k, args.detalle)
+    if args.comando == "ciclo":
+        return _cmd_ciclo(
+            args.entrada,
+            args.destino,
+            args.k,
+            args.ejecutar,
+            args.forzar,
+            args.sin_registro,
+        )
 
     # Sin subcomando: mostrar la ayuda.
     parser.print_help()

@@ -6,7 +6,7 @@
 ## Fase 0 — Concepto rector ✅
 
 - [x] Definición, límites y arquitectura (`concepto-maestro.md` v0.2)
-- [x] Decisiones registradas (ADR 0001–0011)
+- [x] Decisiones registradas (ADR 0001–0012)
 
 ## Fase 1 — Documentación base ✅
 
@@ -33,6 +33,7 @@
 
 - [x] Preguntas y respuestas con fuentes → `ampa responder` (extractiva y citada, ADR 0011)
 - [x] Modo diagnóstico → `ampa responder --detalle` (percepción + scores)
+- [x] **Ciclo** percepción → memoria → acción → `ampa ciclo` (propone; ejecuta con autorización, ADR 0012)
 - [ ] Integración con el motor (`llama.cpp`) para generar sobre las citas
 
 ## Fase 5 — Escriba seguro 🟡 (núcleo)
