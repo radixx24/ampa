@@ -17,6 +17,8 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
 - **Parsea** fórmulas a su composición (elemento → átomos), con paréntesis.
 - Calcula la **masa molar** y expone datos por elemento (masa, grupo, periodo,
   categoría) para visualización.
+- Modela **moléculas** (átomos + enlaces), deriva su fórmula/masa y **guarda
+  compuestos** que tú alimentes (`ampa compuesto`).
 - Devuelve entidades estructuradas y serializables (`to_dict`, JSON).
 
 **No hace:**
@@ -34,6 +36,8 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
   `composicion`, `masa_molar`, `texto`.
 - `Elemento` (tabla periódica): `simbolo`, `z`, `nombre`, `masa`, `periodo`,
   `grupo`, `categoria`; `tabla()` los devuelve todos y `ampa quimica --tabla` los vuelca.
+- `Molecula` (átomos + enlaces): `formula()`, `composicion()`, `masa_molar()`,
+  `to_dict()`; se persiste con `guardar_compuesto` / `cargar_compuestos`.
 
 ## 5. Flujo interno
 
@@ -65,9 +69,12 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
   símbolos, compuestos por fórmula/nombre, elementos por nombre, no duplicar el
   elemento dentro de un compuesto, ausencia de falsos positivos, y datos de la
   tabla (118 elementos, masa molar, datos por elemento).
+- `tests/test_molecules.py` (4 casos): fórmula de Hill, masa, validación y
+  persistencia de compuestos.
 - Ejecutar: `python -m unittest discover -s tests -t .`
 
 ## 10. Cambios pendientes
 
 - Ampliar aún más el diccionario de compuestos y los sinónimos.
+- **Editor de carbono**: grupos funcionales y reacciones sobre el modelo `Molecula`.
 - Balanceo de reacciones y más propiedades (electronegatividad, estados).

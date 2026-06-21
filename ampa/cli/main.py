@@ -13,7 +13,7 @@ from typing import Optional, Sequence
 
 from .. import __version__
 from ..answer import responder
-from ..chemistry import identificar, tabla as tabla_periodica
+from ..chemistry import identificar, molecules as moleculas, tabla as tabla_periodica
 from ..core import paths as paths_mod
 from ..core import platform_info
 from ..cycle import ciclo
@@ -300,6 +300,49 @@ def _cmd_diccionario(termino, como_json) -> int:
     return 0
 
 
+def _cmd_compuesto(accion, desde, como_json) -> int:
+    import json
+
+    if accion == "listar":
+        compuestos = moleculas.cargar_compuestos()
+        if como_json:
+            print(json.dumps([m.to_dict() for m in compuestos], ensure_ascii=False, indent=2))
+        elif not compuestos:
+            print("No hay compuestos guardados.")
+        else:
+            print(f"Compuestos guardados ({len(compuestos)}):")
+            for m in compuestos:
+                print(
+                    f"  - {m.nombre or '(sin nombre)'}: {m.formula()}"
+                    f" · {round(m.masa_molar(), 3)} g/mol"
+                )
+        return 0
+    if not desde:
+        print("error: indica --desde archivo.json (átomos y enlaces).", file=sys.stderr)
+        return 2
+    try:
+        datos = json.loads(Path(desde).read_text(encoding="utf-8"))
+        mol = moleculas.Molecula.from_dict(datos)
+        mol.validar()
+    except (OSError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    if accion == "analizar":
+        if como_json:
+            print(json.dumps(mol.to_dict(), ensure_ascii=False, indent=2))
+        else:
+            print(f"{mol.nombre or '(sin nombre)'}: {mol.formula()}")
+            print(f"  masa molar: {round(mol.masa_molar(), 3)} g/mol")
+            comp = ", ".join(f"{s}×{n}" for s, n in mol.composicion().items())
+            print(f"  composición: {comp}")
+        return 0
+    moleculas.guardar_compuesto(mol)
+    print(
+        f"Compuesto «{mol.nombre or mol.formula()}» guardado en {moleculas.ruta_compuestos()}"
+    )
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ampa",
@@ -513,6 +556,20 @@ def build_parser() -> argparse.ArgumentParser:
         help="Salida en JSON (para herramientas visuales).",
     )
 
+    p_comp = sub.add_parser(
+        "compuesto", help="Guarda y analiza compuestos (moléculas con enlaces)."
+    )
+    p_comp.add_argument(
+        "accion", choices=("guardar", "listar", "analizar"), help="Qué hacer."
+    )
+    p_comp.add_argument(
+        "--desde", default=None,
+        help="Archivo JSON de la molécula (nombre, atomos, enlaces [a,b,orden]).",
+    )
+    p_comp.add_argument(
+        "--json", action="store_true", dest="como_json", help="Salida en JSON."
+    )
+
     return parser
 
 
@@ -577,6 +634,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return _cmd_pensar(args.texto, args.sobre)
     if args.comando == "diccionario":
         return _cmd_diccionario(args.termino, args.como_json)
+    if args.comando == "compuesto":
+        return _cmd_compuesto(args.accion, args.desde, args.como_json)
 
     # Sin subcomando: mostrar la ayuda.
     parser.print_help()

@@ -56,6 +56,10 @@ versionado según [SemVer](https://semver.org/lang/es/).
   `ampa pensar "..."` guarda tus pensamientos (términos `--sobre` o autodetectados)
   y `ampa diccionario [término] [--json]` los conserva y agrupa. Capa **adaptativa**:
   el diccionario crece con lo que pones. +3 pruebas (**80** en total).
+- **Modelo de moléculas y compuestos** (`ampa/chemistry/molecules.py`): `Molecula`
+  (átomos + enlaces) deriva fórmula (Hill), composición y masa molar; `ampa
+  compuesto guardar|listar|analizar` **guarda tus compuestos** (JSON portable).
+  Base del editor de enlaces de carbono. +4 pruebas (**84** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.
