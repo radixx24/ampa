@@ -73,6 +73,10 @@ versionado según [SemVer](https://semver.org/lang/es/).
   (Química / Filosofía) que consume la API. Incluye **tabla periódica interactiva**
   (coloreada por categoría), identificación, **editor de moléculas** (con grupos y
   reacciones) y el **cuaderno/diccionario** personal. `npm run build` verificado.
+- **`ampa ampakadabra`** ✨: un solo comando que **conjura web + API** — compila el
+  frontend si hace falta, lo sirve junto a la API desde el **mismo servidor** (un
+  artefacto portable) y abre el navegador. La API sirve el build de React con
+  fallback SPA. +2 pruebas (**101** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.

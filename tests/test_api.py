@@ -1,7 +1,9 @@
 """Pruebas de la API (despacho puro, sin sockets)."""
+import tempfile
 import unittest
+from pathlib import Path
 
-from ampa.api.server import manejar
+from ampa.api.server import manejar, resolver_estatico
 
 ETANOL = {
     "nombre": "etanol",
@@ -48,6 +50,28 @@ class TestApi(unittest.TestCase):
         )
         self.assertEqual(status, 400)
         self.assertIn("error", cuerpo)
+
+
+class TestEstatico(unittest.TestCase):
+    def test_sirve_index_assets_y_fallback_spa(self):
+        with tempfile.TemporaryDirectory() as d:
+            base = Path(d)
+            (base / "index.html").write_text("<h1>AMPA</h1>", encoding="utf-8")
+            (base / "assets").mkdir()
+            (base / "assets" / "app.js").write_text("ok", encoding="utf-8")
+            status, cuerpo, _ = resolver_estatico(base, "/")
+            self.assertEqual(status, 200)
+            self.assertIn(b"AMPA", cuerpo)
+            status, _, tipo = resolver_estatico(base, "/assets/app.js")
+            self.assertEqual(status, 200)
+            self.assertIn("javascript", tipo)
+            status, cuerpo, _ = resolver_estatico(base, "/cualquier/ruta/spa")
+            self.assertEqual(status, 200)  # fallback SPA a index.html
+            self.assertIn(b"AMPA", cuerpo)
+
+    def test_sin_directorio_da_404(self):
+        status, _, _ = resolver_estatico(None, "/")
+        self.assertEqual(status, 404)
 
 
 if __name__ == "__main__":

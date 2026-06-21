@@ -7,7 +7,9 @@ poder llamarla desde el servidor de desarrollo del frontend.
 from __future__ import annotations
 
 import json
+import mimetypes
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from typing import Callable, Dict, Optional, Tuple
 
 from .. import __version__
@@ -80,7 +82,28 @@ def manejar(metodo: str, ruta: str, datos: Optional[dict] = None) -> Tuple[int, 
         return 400, {"error": str(exc)}
 
 
+def resolver_estatico(estaticos: Optional[Path], ruta: str) -> Tuple[int, bytes, str]:
+    """Resuelve un archivo del frontend compilado, con fallback SPA a index.html."""
+    if not estaticos or not estaticos.exists():
+        return 404, b"frontend sin compilar (npm run build en frontend/)", "text/plain; charset=utf-8"
+    rel = ruta.split("?", 1)[0].lstrip("/") or "index.html"
+    archivo = estaticos / rel
+    try:
+        archivo = archivo.resolve()
+        archivo.relative_to(estaticos.resolve())
+    except (ValueError, OSError):
+        archivo = estaticos / "index.html"
+    if not archivo.is_file():
+        archivo = estaticos / "index.html"  # fallback SPA
+    if not archivo.is_file():
+        return 404, b"no encontrado", "text/plain; charset=utf-8"
+    tipo = mimetypes.guess_type(str(archivo))[0] or "application/octet-stream"
+    return 200, archivo.read_bytes(), tipo
+
+
 class _Handler(BaseHTTPRequestHandler):
+    estaticos: Optional[Path] = None
+
     def _cors(self) -> None:
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
@@ -101,7 +124,16 @@ class _Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self) -> None:  # noqa: N802
-        self._responder(*manejar("GET", self.path))
+        if self.path.startswith("/api/"):
+            self._responder(*manejar("GET", self.path))
+            return
+        status, datos, tipo = resolver_estatico(self.estaticos, self.path)
+        self.send_response(status)
+        self.send_header("Content-Type", tipo)
+        self._cors()
+        self.send_header("Content-Length", str(len(datos)))
+        self.end_headers()
+        self.wfile.write(datos)
 
     def do_POST(self) -> None:  # noqa: N802
         longitud = int(self.headers.get("Content-Length", 0) or 0)
@@ -117,10 +149,17 @@ class _Handler(BaseHTTPRequestHandler):
         pass
 
 
-def servir(puerto: int = 8000, host: str = "127.0.0.1") -> None:
-    """Arranca la API en ``host:puerto`` hasta Ctrl+C."""
+def servir(
+    puerto: int = 8000, host: str = "127.0.0.1", estaticos: Optional[Path] = None
+) -> None:
+    """Arranca la API (y, si existe, el frontend compilado) hasta Ctrl+C."""
+    if estaticos is None:
+        estaticos = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+    estaticos = Path(estaticos)
+    _Handler.estaticos = estaticos if estaticos.exists() else None
     servidor = ThreadingHTTPServer((host, puerto), _Handler)
-    print(f"AMPA API en http://{host}:{puerto}  (Ctrl+C para parar)")
+    que = "web + API" if _Handler.estaticos else "API"
+    print(f"AMPA ({que}) en http://{host}:{puerto}  (Ctrl+C para parar)")
     try:
         servidor.serve_forever()
     except KeyboardInterrupt:

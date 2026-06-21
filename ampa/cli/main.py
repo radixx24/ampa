@@ -363,6 +363,48 @@ def _cmd_servir(puerto) -> int:
     return 0
 
 
+def _construir_frontend(frontend_dir) -> bool:
+    import shutil
+    import subprocess
+
+    if not (frontend_dir / "package.json").exists() or shutil.which("npm") is None:
+        return False
+    print("🔧  Compilando el frontend (npm)…")
+    try:
+        if not (frontend_dir / "node_modules").exists():
+            subprocess.run(["npm", "install"], cwd=str(frontend_dir), check=True)
+        subprocess.run(["npm", "run", "build"], cwd=str(frontend_dir), check=True)
+        return True
+    except (subprocess.CalledProcessError, OSError) as exc:
+        print(f"   (no se pudo compilar: {exc})")
+        return False
+
+
+def _cmd_ampakadabra(puerto, sin_navegador, construir) -> int:
+    import threading
+    import webbrowser
+
+    from ..api import servir
+
+    raiz = Path(__file__).resolve().parents[2]
+    frontend = raiz / "frontend"
+    dist = frontend / "dist"
+    if construir or not dist.exists():
+        _construir_frontend(frontend)
+
+    url = f"http://127.0.0.1:{puerto}"
+    print("\n✨🪄  ¡A M P A K A D A B R A!  🪄✨")
+    if dist.exists():
+        print(f"    Web + API conjuradas en  {url}\n")
+        if not sin_navegador:
+            threading.Timer(1.0, lambda: webbrowser.open(url)).start()
+    else:
+        print(f"    API en  {url}")
+        print("    (frontend sin compilar: usa --construir o 'npm run build' en frontend/)\n")
+    servir(puerto)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ampa",
@@ -597,6 +639,18 @@ def build_parser() -> argparse.ArgumentParser:
         "--puerto", type=int, default=8000, help="Puerto de escucha (def. 8000)."
     )
 
+    p_magia = sub.add_parser(
+        "ampakadabra", help="✨ Conjura la web + la API con un solo comando."
+    )
+    p_magia.add_argument("--puerto", type=int, default=8000, help="Puerto (def. 8000).")
+    p_magia.add_argument(
+        "--sin-navegador", action="store_true", dest="sin_navegador",
+        help="No abrir el navegador automáticamente.",
+    )
+    p_magia.add_argument(
+        "--construir", action="store_true", help="Recompila el frontend antes de servir."
+    )
+
     return parser
 
 
@@ -665,6 +719,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return _cmd_compuesto(args.accion, args.desde, args.como_json)
     if args.comando == "servir":
         return _cmd_servir(args.puerto)
+    if args.comando == "ampakadabra":
+        return _cmd_ampakadabra(args.puerto, args.sin_navegador, args.construir)
 
     # Sin subcomando: mostrar la ayuda.
     parser.print_help()

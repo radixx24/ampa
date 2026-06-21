@@ -12,6 +12,7 @@ frontend (p. ej. React), **sin dependencias** (`http.server`).
 
 **Hace:**
 - Sirve endpoints JSON (química y filosofía) con **CORS** para el frontend.
+- Sirve además el **frontend compilado** (`frontend/dist`) con fallback SPA.
 - Despacha con una función **pura** `manejar(metodo, ruta, datos)` (testeable).
 - Reutiliza los dominios; no añade lógica nueva.
 
@@ -31,6 +32,10 @@ frontend (p. ej. React), **sin dependencias** (`http.server`).
 - `GET/POST /api/quimica/compuestos` (listar / guardar)
 - `POST /api/filosofia/identificar` · `POST /api/filosofia/pensar`
 - `GET  /api/filosofia/diccionario`
+- `GET  /*` → frontend compilado (SPA), si existe `frontend/dist`.
+
+Arranque: `ampa servir` (solo API/estáticos) o `ampa ampakadabra` ✨ (compila el
+frontend si falta, sirve web + API y abre el navegador).
 
 ## 5. Flujo interno
 
@@ -61,5 +66,5 @@ frontend (p. ej. React), **sin dependencias** (`http.server`).
 
 ## 10. Cambios pendientes
 
-- Más endpoints (reacciones, cuaderno) según los pida el frontend.
-- Opción de servir el build estático de React desde la propia API.
+- Más endpoints según los pida el frontend.
+- Empaquetar `ampakadabra` como ejecutable único para distribución.
