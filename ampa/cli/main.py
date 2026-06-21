@@ -13,6 +13,7 @@ from typing import Optional, Sequence
 
 from .. import __version__
 from ..answer import responder
+from ..chemistry import identificar
 from ..core import paths as paths_mod
 from ..core import platform_info
 from ..cycle import ciclo
@@ -194,6 +195,29 @@ def _cmd_ciclo(entrada, destino, k, ejecutar, forzar, sin_registro) -> int:
     return 0
 
 
+def _cmd_quimica(texto, como_json) -> int:
+    resultado = identificar(texto)
+    if como_json:
+        import json
+
+        print(json.dumps(resultado.to_dict(), ensure_ascii=False, indent=2))
+        return 0
+    if not resultado.hay():
+        print("No se identificaron elementos ni compuestos.")
+        return 0
+    if resultado.elementos:
+        print("Elementos:")
+        for e in resultado.elementos:
+            print(f"  - {e.simbolo} ({e.nombre}, Z={e.numero_atomico})")
+    if resultado.compuestos:
+        print("Compuestos:")
+        for c in resultado.compuestos:
+            comp = ", ".join(f"{el}×{n}" for el, n in c.composicion.items())
+            nombre = f" {c.nombre}" if c.nombre else ""
+            print(f"  - {c.formula}{nombre} [{comp}]")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ampa",
@@ -365,6 +389,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="No recuerda la observación (ni diario ni memoria).",
     )
 
+    p_quim = sub.add_parser(
+        "quimica", help="Identifica elementos y compuestos químicos en un texto."
+    )
+    p_quim.add_argument("texto", help="El texto a analizar.")
+    p_quim.add_argument(
+        "--json", action="store_true", dest="como_json",
+        help="Salida en JSON (para herramientas visuales).",
+    )
+
     return parser
 
 
@@ -421,6 +454,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             args.forzar,
             args.sin_registro,
         )
+    if args.comando == "quimica":
+        return _cmd_quimica(args.texto, args.como_json)
 
     # Sin subcomando: mostrar la ayuda.
     parser.print_help()

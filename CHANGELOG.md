@@ -36,6 +36,11 @@ versionado según [SemVer](https://semver.org/lang/es/).
 - **Ingesta de carpeta**: `ampa recordar --carpeta apuntes/` ingiere
   recursivamente los `.md`/`.txt` (omite ilegibles), con citas por ruta relativa
   (POSIX). +2 pruebas (**61** en total).
+- **Reconocimiento químico** (`ampa/chemistry/`) y comando `ampa quimica`
+  (`--json`): identifica **elementos** y **compuestos** (por nombre o fórmula) y
+  los entrega estructurados (símbolo, Z, composición) para usos visuales. Incluye
+  tabla periódica (118) y parser de fórmulas. Módulo `docs/modulos/quimica.md` y
+  **ADR 0013**. +7 pruebas (**68** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.

@@ -6,7 +6,7 @@
 ## Fase 0 — Concepto rector ✅
 
 - [x] Definición, límites y arquitectura (`concepto-maestro.md` v0.2)
-- [x] Decisiones registradas (ADR 0001–0012)
+- [x] Decisiones registradas (ADR 0001–0013)
 
 ## Fase 1 — Documentación base ✅
 
@@ -45,7 +45,8 @@
 
 ## Fase 6 — Dominio químico-filosófico ⏳
 
-- [ ] Base curada mínima de química y filosofía
+- [x] Base de **química**: tabla periódica + compuestos + reconocedor (`ampa/chemistry/`, `ampa quimica`, ADR 0013)
+- [ ] Base curada de **filosofía**
 - [ ] Pruebas por dominio
 - [ ] Capa epistémica: origen y confianza por respuesta
 
