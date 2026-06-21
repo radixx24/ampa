@@ -12,6 +12,7 @@ RAG, ADR 0002).
 ## 2. Responsabilidad exacta
 
 **Hace:**
+- Ingiere texto, un archivo o una **carpeta** completa (recursivo, `.md`/`.txt`).
 - Trocea apuntes en **fragmentos citables** (`chunker`), respetando los párrafos.
 - Etiqueta cada fragmento con su **dominio** (reutiliza la percepción).
 - Persiste los fragmentos en JSONL portable (`store`, bajo `Paths.memory`).
@@ -24,8 +25,8 @@ RAG, ADR 0002).
 
 ## 3. Entradas
 
-- Ingesta: `texto` o `ruta_fuente`, `fuente`, `max_palabras`, `solapamiento`,
-  `clasificar`.
+- Ingesta: `texto`, `ruta_fuente` o `carpeta` (recursiva); `fuente`, `max_palabras`,
+  `solapamiento`, `clasificar`.
 - Consulta: `consulta` (str), `k` (número de resultados).
 
 ## 4. Salidas

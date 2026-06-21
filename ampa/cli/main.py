@@ -20,6 +20,7 @@ from ..memory import (
     cargar_fragmentos,
     fuentes,
     ingerir,
+    ingerir_carpeta,
     recuperar,
     reiniciar,
     ruta_memoria,
@@ -109,13 +110,29 @@ def _cmd_restaurar(ruta, respaldo) -> int:
 
 
 def _cmd_recordar(
-    texto, desde, fuente, max_palabras, solapamiento, reiniciar_, sin_clasificar
+    texto, desde, carpeta, fuente, max_palabras, solapamiento, reiniciar_, sin_clasificar
 ) -> int:
-    if texto is None and desde is None:
-        print("error: indica --texto o --desde.", file=sys.stderr)
+    if texto is None and desde is None and carpeta is None:
+        print("error: indica --texto, --desde o --carpeta.", file=sys.stderr)
         return 2
     if reiniciar_:
         reiniciar()
+    if carpeta is not None:
+        res = ingerir_carpeta(
+            Path(carpeta),
+            clasificar=not sin_clasificar,
+            max_palabras=max_palabras,
+            solapamiento=solapamiento,
+        )
+        print(
+            f"Ingeridos {res.fragmentos} fragmentos de {res.archivos} archivos"
+            f" en {ruta_memoria()}"
+        )
+        for fuente_arch, cantidad in res.por_archivo:
+            print(f"  - {fuente_arch}: {cantidad}")
+        if res.omitidos:
+            print(f"  ({res.omitidos} archivo(s) omitido(s) por ilegibles)")
+        return 0
     frags = ingerir(
         texto=texto,
         ruta_fuente=Path(desde) if desde else None,
@@ -267,6 +284,11 @@ def build_parser() -> argparse.ArgumentParser:
     grupo_rec = p_rec.add_mutually_exclusive_group()
     grupo_rec.add_argument("--texto", default=None, help="Texto a recordar.")
     grupo_rec.add_argument("--desde", default=None, help="Archivo de apuntes a ingerir.")
+    grupo_rec.add_argument(
+        "--carpeta",
+        default=None,
+        help="Carpeta de apuntes a ingerir (recursivo, .md/.txt).",
+    )
     p_rec.add_argument(
         "--fuente", default=None, help="Nombre de la fuente (aparece en las citas)."
     )
@@ -377,6 +399,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return _cmd_recordar(
             args.texto,
             args.desde,
+            args.carpeta,
             args.fuente,
             args.max_palabras,
             args.solapamiento,

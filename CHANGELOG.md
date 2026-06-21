@@ -33,6 +33,9 @@ versionado según [SemVer](https://semver.org/lang/es/).
   `--ejecutar` recuerda (diario + memoria) y escribe con respaldo bajo la puerta
   de riesgo (`--forzar`). Módulo `docs/modulos/ciclo.md` y **ADR 0012**.
   +4 pruebas (**59** en total).
+- **Ingesta de carpeta**: `ampa recordar --carpeta apuntes/` ingiere
+  recursivamente los `.md`/`.txt` (omite ilegibles), con citas por ruta relativa
+  (POSIX). +2 pruebas (**61** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.

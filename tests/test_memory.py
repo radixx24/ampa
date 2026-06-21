@@ -3,7 +3,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from ampa.memory import cargar_fragmentos, ingerir, recuperar, trocear
+from ampa.memory import (
+    cargar_fragmentos,
+    ingerir,
+    ingerir_carpeta,
+    recuperar,
+    trocear,
+)
 
 QUIMICA = "El enlace covalente se forma cuando dos atomos comparten electrones de valencia."
 FILOSOFIA = "La epistemologia de Kant distingue el fenomeno de la cosa en si misma."
@@ -62,6 +68,28 @@ class TestRetriever(unittest.TestCase):
             ruta = Path(d) / "frag.jsonl"
             ingerir(texto=QUIMICA, fuente="q.md", ruta=ruta, clasificar=False)
             self.assertEqual(recuperar("que es el de la", ruta=ruta), [])
+
+
+class TestIngerirCarpeta(unittest.TestCase):
+    def test_recursivo_y_filtra_por_extension(self):
+        with tempfile.TemporaryDirectory() as d:
+            base = Path(d) / "apuntes"
+            (base / "sub").mkdir(parents=True)
+            (base / "quimica.md").write_text(QUIMICA, encoding="utf-8")
+            (base / "sub" / "filosofia.txt").write_text(FILOSOFIA, encoding="utf-8")
+            (base / "ignora.png").write_text("extension no permitida", encoding="utf-8")
+            ruta = Path(d) / "frag.jsonl"
+            res = ingerir_carpeta(base, ruta=ruta, clasificar=False)
+            self.assertEqual(res.archivos, 2)
+            self.assertEqual(res.fragmentos, 2)
+            nombres = {fuente for fuente, _ in res.por_archivo}
+            self.assertIn("quimica.md", nombres)
+            self.assertIn("sub/filosofia.txt", nombres)  # ruta relativa POSIX
+            self.assertEqual(len(cargar_fragmentos(ruta)), 2)
+
+    def test_carpeta_inexistente_falla(self):
+        with self.assertRaises(ValueError):
+            ingerir_carpeta(Path("/no/existe/jamas/ampa"))
 
 
 if __name__ == "__main__":

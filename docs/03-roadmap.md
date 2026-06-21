@@ -25,7 +25,7 @@
 
 ## Fase 3 — Memoria documental 🟡 (núcleo léxico)
 
-- [x] Ingesta de apuntes: troceo (chunking) y metadatos → `ampa/memory/` + `ampa recordar`
+- [x] Ingesta de apuntes: troceo (chunking) y metadatos → `ampa/memory/` + `ampa recordar` (texto/archivo/carpeta)
 - [x] Recuperación contextual con **citas** (BM25 portable, ADR 0010) → `ampa consultar`
 - [ ] Embeddings + índice vectorial (segunda iteración; complementa a BM25)
 
