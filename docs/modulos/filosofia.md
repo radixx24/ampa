@@ -7,7 +7,9 @@
 
 Identificar **filósofos**, **corrientes** y **conceptos** en texto y entregarlos
 **estructurados** (época, corriente, rama), como base del dominio filosófico
-(Fase 6) y para capas visuales/adaptativas.
+(Fase 6) y para capas visuales/adaptativas. Además mantiene un **cuaderno
+personal**: tú añades pensamientos y AMPA conserva un **diccionario** que crece
+con lo que pones (término → tus reflexiones).
 
 ## 2. Responsabilidad exacta
 
@@ -15,6 +17,8 @@ Identificar **filósofos**, **corrientes** y **conceptos** en texto y entregarlo
 - Reconoce **filósofos** por nombre, con su **época** y **corriente**.
 - Reconoce **corrientes** (`-ismo`s) y **conceptos** (con su **rama**).
 - Coincidencia de palabra completa, sin acentos (evita falsos positivos).
+- **Conserva pensamientos** del usuario y construye un **diccionario personal**
+  (término → pensamientos), con términos detectados o indicados (`--sobre`).
 - Devuelve entidades estructuradas y serializables (`to_dict`, JSON).
 
 **No hace:**
@@ -30,6 +34,8 @@ Identificar **filósofos**, **corrientes** y **conceptos** en texto y entregarlo
 - `ResultadoFilosofia`: `filosofos`, `corrientes`, `conceptos`
   (`EntidadFilosofica`), con `to_dict()`.
 - `EntidadFilosofica`: `tipo`, `nombre`, `categoria` (corriente/rama), `epoca`, `texto`.
+- `Pensamiento` (cuaderno): `texto`, `terminos`, `timestamp`; `diccionario()`
+  agrupa por término (`ampa pensar` / `ampa diccionario [término] [--json]`).
 
 ## 5. Flujo interno
 
@@ -53,8 +59,9 @@ Identificar **filósofos**, **corrientes** y **conceptos** en texto y entregarlo
 
 ## 9. Pruebas mínimas
 
-- `tests/test_philosophy.py` (5 casos): filósofos/corrientes/conceptos, metadatos,
-  «marxismo» ≠ «Marx», ausencia de falsos positivos y estructura `to_dict`.
+- `tests/test_philosophy.py` (8 casos): filósofos/corrientes/conceptos, metadatos,
+  «marxismo» ≠ «Marx», ausencia de falsos positivos, estructura `to_dict`, y el
+  **cuaderno** (agrupación, detección automática y vacío).
 - Ejecutar: `python -m unittest discover -s tests -t .`
 
 ## 10. Cambios pendientes

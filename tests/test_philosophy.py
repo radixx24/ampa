@@ -1,7 +1,9 @@
 """Pruebas del reconocimiento de filosofía (philosophy)."""
+import tempfile
 import unittest
+from pathlib import Path
 
-from ampa.philosophy import identificar
+from ampa.philosophy import identificar, notebook
 
 
 class TestFilosofia(unittest.TestCase):
@@ -37,6 +39,30 @@ class TestFilosofia(unittest.TestCase):
         datos = r.to_dict()
         self.assertEqual({"filosofos", "corrientes", "conceptos"}, set(datos))
         self.assertEqual(datos["filosofos"][0]["nombre"], "Platón")
+
+
+class TestCuaderno(unittest.TestCase):
+    def test_agregar_con_terminos_explicitos_agrupa(self):
+        with tempfile.TemporaryDirectory() as d:
+            ruta = Path(d) / "pensamientos.jsonl"
+            notebook.agregar("El ser es lo que persiste.", ["ser"], ruta=ruta)
+            notebook.agregar("El Ser y el devenir.", ["Ser", "devenir"], ruta=ruta)
+            dicc = notebook.diccionario(ruta)
+            self.assertEqual(len(dicc["ser"]), 2)  # 'ser' y 'Ser' se agrupan
+            self.assertIn("devenir", dicc)
+
+    def test_terminos_detectados_automaticamente(self):
+        with tempfile.TemporaryDirectory() as d:
+            ruta = Path(d) / "pensamientos.jsonl"
+            p = notebook.agregar("Pienso en la metafísica de Kant.", ruta=ruta)
+            self.assertIn("metafísica", p.terminos)
+            self.assertIn("Kant", p.terminos)
+
+    def test_cuaderno_vacio(self):
+        with tempfile.TemporaryDirectory() as d:
+            ruta = Path(d) / "no.jsonl"
+            self.assertEqual(notebook.leer(ruta), [])
+            self.assertEqual(notebook.diccionario(ruta), {})
 
 
 if __name__ == "__main__":

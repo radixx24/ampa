@@ -28,6 +28,7 @@ from ..memory import (
 )
 from ..perception import journal, perceive
 from ..philosophy import identificar as identificar_filosofia
+from ..philosophy import notebook
 from ..scribe import writer as scribe
 
 
@@ -259,6 +260,46 @@ def _cmd_filosofia(texto, como_json) -> int:
     return 0
 
 
+def _cmd_pensar(texto, sobre) -> int:
+    terminos = [t.strip() for t in sobre.split(",") if t.strip()] if sobre else None
+    pensamiento = notebook.agregar(texto, terminos)
+    print(f"Pensamiento guardado en {notebook.ruta_cuaderno()}")
+    if pensamiento.terminos:
+        print(f"  términos: {', '.join(pensamiento.terminos)}")
+    else:
+        print('  (sin términos; usa --sobre "t1,t2" para indicarlos)')
+    return 0
+
+
+def _cmd_diccionario(termino, como_json) -> int:
+    import json
+
+    from ..philosophy.data import normalizar
+
+    dicc = notebook.diccionario()
+    if como_json:
+        datos = {t: [p.to_dict() for p in ps] for t, ps in dicc.items()}
+        print(json.dumps(datos, ensure_ascii=False, indent=2))
+        return 0
+    if termino:
+        clave = normalizar(termino)
+        encontrado = next((t for t in dicc if normalizar(t) == clave), None)
+        if not encontrado:
+            print(f"No hay entradas para «{termino}».")
+            return 0
+        print(f"{encontrado} ({len(dicc[encontrado])}):")
+        for p in dicc[encontrado]:
+            print(f"  - {p.texto}")
+        return 0
+    if not dicc:
+        print('El diccionario está vacío. Añade con: ampa pensar "..."')
+        return 0
+    print(f"Diccionario personal ({len(dicc)} términos):")
+    for t, n in notebook.terminos():
+        print(f"  - {t}: {n}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ampa",
@@ -452,6 +493,26 @@ def build_parser() -> argparse.ArgumentParser:
         help="Salida en JSON (para herramientas visuales).",
     )
 
+    p_pensar = sub.add_parser(
+        "pensar", help="Añade un pensamiento al cuaderno personal de filosofía."
+    )
+    p_pensar.add_argument("texto", help="El pensamiento a guardar.")
+    p_pensar.add_argument(
+        "--sobre", default=None,
+        help="Términos a los que alude, separados por comas (si no, se detectan).",
+    )
+
+    p_dicc = sub.add_parser(
+        "diccionario", help="Muestra tu diccionario personal (término → pensamientos)."
+    )
+    p_dicc.add_argument(
+        "termino", nargs="?", default=None, help="Término a consultar (opcional)."
+    )
+    p_dicc.add_argument(
+        "--json", action="store_true", dest="como_json",
+        help="Salida en JSON (para herramientas visuales).",
+    )
+
     return parser
 
 
@@ -512,6 +573,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return _cmd_quimica(args.texto, args.como_json, args.tabla)
     if args.comando == "filosofia":
         return _cmd_filosofia(args.texto, args.como_json)
+    if args.comando == "pensar":
+        return _cmd_pensar(args.texto, args.sobre)
+    if args.comando == "diccionario":
+        return _cmd_diccionario(args.termino, args.como_json)
 
     # Sin subcomando: mostrar la ayuda.
     parser.print_help()

@@ -52,6 +52,10 @@ versionado según [SemVer](https://semver.org/lang/es/).
   (`--json`): identifica **filósofos** (época y corriente), **corrientes** y
   **conceptos** (rama). Módulo `docs/modulos/filosofia.md`. Cierra «base de
   filosofía» y «pruebas por dominio» de la Fase 6. +5 pruebas (**77** en total).
+- **Cuaderno y diccionario personal de filosofía** (`ampa/philosophy/notebook.py`):
+  `ampa pensar "..."` guarda tus pensamientos (términos `--sobre` o autodetectados)
+  y `ampa diccionario [término] [--json]` los conserva y agrupa. Capa **adaptativa**:
+  el diccionario crece con lo que pones. +3 pruebas (**80** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.
