@@ -69,6 +69,10 @@ versionado según [SemVer](https://semver.org/lang/es/).
   filosofía por HTTP/JSON con **cero dependencias** (`http.server`) y CORS, lista
   para un frontend React. Despacho puro y testeable (`manejar`). **ADR 0015** y
   módulo `docs/modulos/api.md`. +7 pruebas (**99** en total).
+- **Frontend React (Vite)** en `frontend/`: interfaz fresca con **dos apartados**
+  (Química / Filosofía) que consume la API. Incluye **tabla periódica interactiva**
+  (coloreada por categoría), identificación, **editor de moléculas** (con grupos y
+  reacciones) y el **cuaderno/diccionario** personal. `npm run build` verificado.
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.
