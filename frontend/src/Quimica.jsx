@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, slug } from "./api.js";
+import EditorVisual from "./EditorVisual.jsx";
 
 function TablaPeriodica() {
   const [els, setEls] = useState([]);
@@ -96,100 +97,12 @@ function Identificar() {
   );
 }
 
-const EJEMPLO = JSON.stringify({
-  nombre: "etanol",
-  atomos: ["C", "C", "O", "H", "H", "H", "H", "H", "H"],
-  enlaces: [[0, 1, 1], [1, 2, 1], [2, 3, 1], [0, 4, 1], [0, 5, 1], [0, 6, 1], [1, 7, 1], [1, 8, 1]],
-});
-
-function Editor() {
-  const [texto, setTexto] = useState(EJEMPLO);
-  const [res, setRes] = useState(null);
-  const [error, setError] = useState("");
-  const [guardados, setGuardados] = useState([]);
-
-  const cargar = () => api.listarCompuestos().then(setGuardados).catch(() => {});
-  useEffect(() => { cargar(); }, []);
-
-  function leer() {
-    return JSON.parse(texto);
-  }
-
-  async function analizar() {
-    try {
-      setError("");
-      setRes(await api.analizar(leer()));
-    } catch (e) {
-      setError("" + e);
-    }
-  }
-
-  async function guardar() {
-    try {
-      setError("");
-      await api.guardarCompuesto(leer());
-      cargar();
-    } catch (e) {
-      setError("" + e);
-    }
-  }
-
-  return (
-    <section className="card">
-      <h3>Editor de moléculas (enlaces de carbono)</h3>
-      <p className="hint">{"JSON: { nombre, atomos:[…], enlaces:[[a,b,orden],…] }"}</p>
-      <textarea rows={5} className="mono" value={texto} onChange={(e) => setTexto(e.target.value)} />
-      <div className="row">
-        <button onClick={analizar}>Analizar</button>
-        <button className="sec" onClick={guardar}>Guardar compuesto</button>
-      </div>
-      {error && <p className="err">{error}</p>}
-      {res && (
-        <div className="result">
-          <p className="formula">
-            <b>{res.formula}</b> · {res.masa_molar} g/mol
-          </p>
-          <p>
-            Grupos:{" "}
-            {res.grupos_funcionales.length
-              ? res.grupos_funcionales.map((g, i) => <span key={i} className="chip">{g}</span>)
-              : "—"}
-          </p>
-          {res.reacciones.length > 0 && (
-            <ul className="reacciones">
-              {res.reacciones.map((r, i) => (
-                <li key={i}>
-                  <span className="tipo">{r.tipo}</span> {r.ecuacion}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-      {guardados.length > 0 && (
-        <div className="guardados">
-          <h4>Tus compuestos ({guardados.length})</h4>
-          <ul>
-            {guardados.map((m, i) => (
-              <li key={i}>
-                {m.nombre || "(sin nombre)"} — <b>{m.formula}</b> · {m.masa_molar} g/mol
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </section>
-  );
-}
-
 export default function Quimica() {
   return (
     <div className="apartado">
       <TablaPeriodica />
-      <div className="columnas">
-        <Identificar />
-        <Editor />
-      </div>
+      <Identificar />
+      <EditorVisual />
     </div>
   );
 }

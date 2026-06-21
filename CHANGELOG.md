@@ -71,8 +71,10 @@ versionado según [SemVer](https://semver.org/lang/es/).
   módulo `docs/modulos/api.md`. +7 pruebas (**99** en total).
 - **Frontend React (Vite)** en `frontend/`: interfaz fresca con **dos apartados**
   (Química / Filosofía) que consume la API. Incluye **tabla periódica interactiva**
-  (coloreada por categoría), identificación, **editor de moléculas** (con grupos y
-  reacciones) y el **cuaderno/diccionario** personal. `npm run build` verificado.
+  (coloreada por categoría), identificación, **editor visual de enlaces** (dibujas
+  la molécula con clics en un lienzo SVG → fórmula, masa, grupos y reacciones, y
+  guardas el compuesto) y el **cuaderno/diccionario** personal. `npm run build`
+  verificado.
 - **`ampa ampakadabra`** ✨: un solo comando que **conjura web + API** — compila el
   frontend si hace falta, lo sirve junto a la API desde el **mismo servidor** (un
   artefacto portable) y abre el navegador. La API sirve el build de React con

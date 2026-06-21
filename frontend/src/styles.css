@@ -138,4 +138,21 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .entradas { margin: 4px 0 8px 14px; color: var(--suave); }
 .guardados ul { list-style: none; padding-left: 0; }
 
+/* ---- Editor visual de moléculas ---- */
+.paleta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.paleta span { color: var(--suave); font-size: 13px; }
+.paleta .sep { margin-left: 10px; }
+.pchip {
+  border: 1px solid var(--linea); border-radius: 8px; padding: 4px 11px;
+  cursor: pointer; font-weight: 700; font-size: 14px;
+  background: var(--panel-2); color: var(--texto);
+}
+.pchip.on { outline: 2px solid var(--acento); outline-offset: 1px; }
+.lienzo {
+  width: 100%; height: auto; aspect-ratio: 560 / 320; display: block;
+  background: var(--bg); border: 1px solid var(--linea); border-radius: 10px;
+  margin: 6px 0; touch-action: none;
+}
+.nombre { width: auto; flex: 1 1 120px; margin-bottom: 0; }
+
 .pie { text-align: center; color: var(--suave); font-size: 12px; margin-top: 26px; }
