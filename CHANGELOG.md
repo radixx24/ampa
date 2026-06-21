@@ -75,6 +75,14 @@ versionado según [SemVer](https://semver.org/lang/es/).
   la molécula con clics en un lienzo SVG → fórmula, masa, grupos y reacciones, y
   guardas el compuesto) y el **cuaderno/diccionario** personal. `npm run build`
   verificado.
+- **Editor visual con modos**: construir / **mover** (arrastrar átomos) / **borrar**
+  (eliminar átomos y enlaces) en el lienzo SVG.
+- **Más reacciones** (halogenación de alcanos y alquenos, hidratación, deshidratación,
+  saponificación, reducción…) y **endpoint `POST /api/quimica/reacciones`**.
+  +4 pruebas (**106** en total).
+- **Ejecutable único** (`packaging/build_exe.py`, PyInstaller): un binario que sirve
+  **web + API** sin Python ni Node; el servidor localiza el frontend incrustado vía
+  `sys._MEIPASS`. Verificado de extremo a extremo.
 - **`ampa ampakadabra`** ✨: un solo comando que **conjura web + API** — compila el
   frontend si hace falta, lo sirve junto a la API desde el **mismo servidor** (un
   artefacto portable) y abre el navegador. La API sirve el build de React con

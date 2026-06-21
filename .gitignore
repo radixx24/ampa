@@ -23,6 +23,10 @@ build/
 *.exe
 *.out
 
+# Empaquetado (PyInstaller)
+dist_exe/
+build_exe/
+
 # Entorno y editores
 .env
 .vscode/
