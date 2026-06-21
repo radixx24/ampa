@@ -17,7 +17,7 @@ CLI (Fase 4).
 - **Recupera** los fragmentos más relevantes de la memoria (BM25, con citas).
 - **Compone** una respuesta extractiva: lidera con la mejor evidencia y sus citas.
 - Estima la **confianza** (cobertura de términos + dominio) e indica el **origen**.
-- Señala la **química detectada** en la respuesta (elementos y compuestos).
+- Señala la **química** y la **filosofía** detectadas en la respuesta.
 - Es **honesta**: si no hay evidencia, lo declara y **no inventa**.
 
 **No hace:**
@@ -33,8 +33,8 @@ CLI (Fase 4).
 ## 4. Salidas
 
 - `Respuesta` (dataclass): `consulta`, `evento`, `resultados`, `confianza`,
-  `quimica`; con `dominio`, `riesgo`, `hay_evidencia()`, `fuentes()`/`origen()`,
-  `texto()` y `diagnostico()`.
+  `quimica`, `filosofia`; con `dominio`, `riesgo`, `hay_evidencia()`,
+  `fuentes()`/`origen()`, `texto()` y `diagnostico()`.
 
 ## 5. Flujo interno
 
@@ -62,9 +62,9 @@ CLI (Fase 4).
 
 ## 9. Pruebas mínimas
 
-- `tests/test_answer.py` (5 casos): respuesta con cita, dominio y **confianza**,
-  honestidad sin evidencia, pregunta fuera de tema, diagnóstico y **química
-  detectada**.
+- `tests/test_answer.py` (6 casos): respuesta con cita, dominio y **confianza**,
+  honestidad sin evidencia, pregunta fuera de tema, diagnóstico, **química** y
+  **filosofía detectadas**.
 - Ejecutar: `python -m unittest discover -s tests -t .`
 
 ## 10. Cambios pendientes

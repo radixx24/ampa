@@ -3,7 +3,7 @@
 Compone una respuesta **extractiva y citada** a partir de los apuntes: percibe la
 consulta (dominio, riesgo), recupera los fragmentos más relevantes (BM25) y los
 presenta con sus citas, su **confianza** y su **origen**. Además señala la
-**química detectada** (elementos y compuestos). La **generación con modelo**
+**química** y la **filosofía** detectadas. La **generación con modelo**
 llegará como capa posterior sobre estos mismos fragmentos (ADR 0011). Sin
 dependencias externas.
 """
@@ -18,6 +18,8 @@ from ..memory import Resultado, recuperar
 from ..memory.retriever import tokenizar
 from ..perception import perceive
 from ..perception.events import Evento
+from ..philosophy import ResultadoFilosofia
+from ..philosophy import identificar as identificar_filosofia
 
 
 def _una_linea(texto: str, limite: int = 220) -> str:
@@ -58,6 +60,7 @@ class Respuesta:
     resultados: List[Resultado]
     confianza: str = "nula"
     quimica: Optional[ResultadoQuimica] = None
+    filosofia: Optional[ResultadoFilosofia] = None
 
     @property
     def dominio(self) -> str:
@@ -95,9 +98,27 @@ class Respuesta:
             partes.append(f"compuestos: {compuestos}")
         return "Química detectada — " + " · ".join(partes)
 
+    def _texto_filosofia(self) -> str:
+        if not self.filosofia or not self.filosofia.hay():
+            return ""
+        partes = []
+        filosofos = ", ".join(f.nombre for f in self.filosofia.filosofos)
+        corrientes = ", ".join(c.nombre for c in self.filosofia.corrientes)
+        conceptos = ", ".join(c.nombre for c in self.filosofia.conceptos)
+        if filosofos:
+            partes.append(f"filósofos: {filosofos}")
+        if corrientes:
+            partes.append(f"corrientes: {corrientes}")
+        if conceptos:
+            partes.append(f"conceptos: {conceptos}")
+        return "Filosofía detectada — " + " · ".join(partes)
+
+    def _extras(self) -> List[str]:
+        return [x for x in (self._texto_quimica(), self._texto_filosofia()) if x]
+
     def texto(self) -> str:
         """Respuesta legible y honesta, con citas, confianza y origen."""
-        quimica = self._texto_quimica()
+        extras = self._extras()
         if not self.resultados:
             cuerpo = (
                 f"No encuentro nada en la memoria sobre «{self.consulta}» "
@@ -105,7 +126,7 @@ class Respuesta:
                 "No invento la respuesta: por ahora solo recupero de tus apuntes, "
                 "aún sin generación con modelo."
             )
-            return cuerpo + (f"\n\n{quimica}" if quimica else "")
+            return cuerpo + "".join(f"\n\n{e}" for e in extras)
         principal = self.resultados[0]
         lineas = [
             f"Según tu memoria (dominio: {self.dominio}):",
@@ -123,8 +144,7 @@ class Respuesta:
             "",
             f"Confianza: {self.confianza} · Origen: {', '.join(self.origen()) or '—'}",
         ]
-        if quimica:
-            lineas.append(quimica)
+        lineas += extras
         lineas += [
             "",
             "— Respuesta por recuperación: citas literales de tus apuntes, sin "
@@ -163,4 +183,5 @@ def responder(
         resultados=resultados,
         confianza=_estimar_confianza(evento, resultados, consulta),
         quimica=identificar(material),
+        filosofia=identificar_filosofia(material),
     )

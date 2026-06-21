@@ -77,6 +77,9 @@ versionado según [SemVer](https://semver.org/lang/es/).
   frontend si hace falta, lo sirve junto a la API desde el **mismo servidor** (un
   artefacto portable) y abre el navegador. La API sirve el build de React con
   fallback SPA. +2 pruebas (**101** en total).
+- **Filosofía en `responder`**: la respuesta señala también los **filósofos,
+  corrientes y conceptos** detectados, simétrico a la química. +1 prueba
+  (**102** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.

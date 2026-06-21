@@ -65,6 +65,19 @@ class TestResponder(unittest.TestCase):
             self.assertIn("H2O", {c.formula for c in resp.quimica.compuestos})
             self.assertIn("Química detectada", resp.texto())
 
+    def test_detecta_filosofia_en_la_respuesta(self):
+        with tempfile.TemporaryDirectory() as d:
+            ruta = Path(d) / "frag.jsonl"
+            ingerir(
+                texto="Kant y el idealismo trascendental fundan la epistemología.",
+                fuente="filo.md",
+                ruta=ruta,
+            )
+            resp = responder("háblame de Kant", ruta=ruta)
+            self.assertTrue(resp.filosofia.hay())
+            self.assertIn("Kant", {f.nombre for f in resp.filosofia.filosofos})
+            self.assertIn("Filosofía detectada", resp.texto())
+
 
 if __name__ == "__main__":
     unittest.main()
