@@ -57,42 +57,65 @@ def _combustion(mol: Molecula) -> Optional[Reaccion]:
 def reacciones(mol: Molecula) -> List[Reaccion]:
     """Reacciones plausibles para ``mol`` según su composición y grupos."""
     resultado: List[Reaccion] = []
+    grupos = grupos_funcionales(mol)
+    formula = mol.formula()
+    composicion = mol.composicion()
+
     combustion = _combustion(mol)
     if combustion:
         resultado.append(combustion)
 
-    grupos = grupos_funcionales(mol)
-    formula = mol.formula()
+    if set(composicion) <= {"C", "H"} and "C" in composicion and not grupos:
+        resultado.append(
+            Reaccion("halogenación", f"{formula} + Cl2 → halogenuro + HCl",
+                     "Sustitución radicalaria (con luz).")
+        )
+
     if "alqueno" in grupos or "alquino" in grupos:
         resultado.append(
-            Reaccion(
-                "hidrogenación",
-                f"{formula} + H2 → alcano",
-                "Adición de H2 al enlace múltiple (catalizada).",
-            )
+            Reaccion("hidrogenación", f"{formula} + H2 → alcano",
+                     "Adición de H2 al enlace múltiple (catalizada).")
+        )
+    if "alqueno" in grupos:
+        resultado.append(
+            Reaccion("halogenación", f"{formula} + Br2 → dibromuro",
+                     "Adición electrófila al doble enlace.")
+        )
+        resultado.append(
+            Reaccion("hidratación", f"{formula} + H2O → alcohol",
+                     "Adición de agua (catálisis ácida).")
+        )
+        resultado.append(
+            Reaccion("oxidación", f"{formula} + [O] → diol",
+                     "Oxidación del doble enlace.")
+        )
+    if "alcohol" in grupos:
+        resultado.append(
+            Reaccion("oxidación", f"{formula} → aldehído/cetona → ácido",
+                     "Oxidación del grupo alcohol.")
+        )
+        resultado.append(
+            Reaccion("deshidratación", f"{formula} → alqueno + H2O",
+                     "Eliminación (catálisis ácida).")
         )
     if "ácido carboxílico" in grupos:
         resultado.append(
-            Reaccion(
-                "neutralización",
-                f"{formula} + NaOH → sal + H2O",
-                "Reacción ácido–base con una base.",
-            )
+            Reaccion("neutralización", f"{formula} + NaOH → sal + H2O",
+                     "Reacción ácido–base con una base.")
         )
         if "alcohol" in grupos:
             resultado.append(
-                Reaccion(
-                    "esterificación",
-                    "ácido + alcohol → éster + H2O",
-                    "Esterificación de Fischer.",
-                )
+                Reaccion("esterificación", "ácido + alcohol → éster + H2O",
+                         "Esterificación de Fischer.")
             )
-    if "alcohol" in grupos:
+    if "éster" in grupos:
         resultado.append(
-            Reaccion(
-                "oxidación",
-                f"{formula} → aldehído/cetona → ácido",
-                "Oxidación del grupo alcohol.",
-            )
+            Reaccion("saponificación", f"{formula} + NaOH → sal + alcohol",
+                     "Hidrólisis básica del éster.")
+        )
+    if "aldehído" in grupos or "cetona" in grupos:
+        resultado.append(
+            Reaccion("reducción", f"{formula} + H2 → alcohol",
+                     "Reducción del grupo carbonilo.")
         )
     return resultado

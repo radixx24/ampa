@@ -51,6 +51,12 @@ class TestApi(unittest.TestCase):
         self.assertEqual(status, 400)
         self.assertIn("error", cuerpo)
 
+    def test_reacciones_endpoint(self):
+        metano = {"atomos": ["C", "H", "H", "H", "H"], "enlaces": [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1]]}
+        status, cuerpo = manejar("POST", "/api/quimica/reacciones", metano)
+        self.assertEqual(status, 200)
+        self.assertIn("combustión", {r["tipo"] for r in cuerpo})
+
 
 class TestEstatico(unittest.TestCase):
     def test_sirve_index_assets_y_fallback_spa(self):

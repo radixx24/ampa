@@ -50,6 +50,15 @@ class TestReacciones(unittest.TestCase):
     def test_neutralizacion_de_acido(self):
         self.assertIn("neutralización", [r.tipo for r in reacciones(ACETICO)])
 
+    def test_halogenacion_de_alcano(self):
+        self.assertIn("halogenación", [r.tipo for r in reacciones(METANO)])
+
+    def test_hidratacion_de_alqueno(self):
+        self.assertIn("hidratación", [r.tipo for r in reacciones(ETENO)])
+
+    def test_deshidratacion_de_alcohol(self):
+        self.assertIn("deshidratación", [r.tipo for r in reacciones(ETANOL)])
+
 
 if __name__ == "__main__":
     unittest.main()

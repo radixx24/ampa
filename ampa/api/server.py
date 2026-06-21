@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import mimetypes
+import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Callable, Dict, Optional, Tuple
@@ -35,6 +36,12 @@ def _analizar_molecula(datos: dict) -> dict:
     return salida
 
 
+def _reacciones(datos: dict) -> list:
+    mol = Molecula.from_dict(datos)
+    mol.validar()
+    return [r.to_dict() for r in reacciones(mol)]
+
+
 def _guardar_compuesto(datos: dict) -> dict:
     mol = Molecula.from_dict(datos)
     guardar_compuesto(mol)
@@ -58,6 +65,7 @@ _RUTAS: Dict[Tuple[str, str], Callable[[dict], object]] = {
         d.get("texto", "")
     ).to_dict(),
     ("POST", "/api/quimica/analizar"): _analizar_molecula,
+    ("POST", "/api/quimica/reacciones"): _reacciones,
     ("GET", "/api/quimica/compuestos"): lambda d: [
         m.to_dict() for m in cargar_compuestos()
     ],
@@ -154,7 +162,10 @@ def servir(
 ) -> None:
     """Arranca la API (y, si existe, el frontend compilado) hasta Ctrl+C."""
     if estaticos is None:
-        estaticos = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+        if getattr(sys, "frozen", False):  # ejecutable empaquetado (PyInstaller)
+            estaticos = Path(getattr(sys, "_MEIPASS", ".")) / "frontend" / "dist"
+        else:
+            estaticos = Path(__file__).resolve().parents[2] / "frontend" / "dist"
     estaticos = Path(estaticos)
     _Handler.estaticos = estaticos if estaticos.exists() else None
     servidor = ThreadingHTTPServer((host, puerto), _Handler)
