@@ -13,7 +13,7 @@ from typing import Optional, Sequence
 
 from .. import __version__
 from ..answer import responder
-from ..chemistry import identificar
+from ..chemistry import identificar, tabla as tabla_periodica
 from ..core import paths as paths_mod
 from ..core import platform_info
 from ..cycle import ciclo
@@ -195,11 +195,26 @@ def _cmd_ciclo(entrada, destino, k, ejecutar, forzar, sin_registro) -> int:
     return 0
 
 
-def _cmd_quimica(texto, como_json) -> int:
+def _cmd_quimica(texto, como_json, tabla) -> int:
+    import json
+
+    if tabla:
+        elementos = tabla_periodica()
+        if como_json:
+            print(json.dumps([e.to_dict() for e in elementos], ensure_ascii=False, indent=2))
+        else:
+            for e in elementos:
+                grupo = e.grupo or "-"
+                print(
+                    f"  {e.z:>3} {e.simbolo:<3} {e.nombre:<13}"
+                    f" masa={e.masa:>7} · P{e.periodo} G{grupo} · {e.categoria}"
+                )
+        return 0
+    if texto is None:
+        print("error: indica un texto o usa --tabla.", file=sys.stderr)
+        return 2
     resultado = identificar(texto)
     if como_json:
-        import json
-
         print(json.dumps(resultado.to_dict(), ensure_ascii=False, indent=2))
         return 0
     if not resultado.hay():
@@ -208,13 +223,13 @@ def _cmd_quimica(texto, como_json) -> int:
     if resultado.elementos:
         print("Elementos:")
         for e in resultado.elementos:
-            print(f"  - {e.simbolo} ({e.nombre}, Z={e.numero_atomico})")
+            print(f"  - {e.simbolo} ({e.nombre}, Z={e.numero_atomico}, {e.masa_molar} u)")
     if resultado.compuestos:
         print("Compuestos:")
         for c in resultado.compuestos:
             comp = ", ".join(f"{el}×{n}" for el, n in c.composicion.items())
             nombre = f" {c.nombre}" if c.nombre else ""
-            print(f"  - {c.formula}{nombre} [{comp}]")
+            print(f"  - {c.formula}{nombre} [{comp}] · {c.masa_molar} g/mol")
     return 0
 
 
@@ -392,10 +407,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_quim = sub.add_parser(
         "quimica", help="Identifica elementos y compuestos químicos en un texto."
     )
-    p_quim.add_argument("texto", help="El texto a analizar.")
+    p_quim.add_argument("texto", nargs="?", default=None, help="El texto a analizar.")
     p_quim.add_argument(
         "--json", action="store_true", dest="como_json",
         help="Salida en JSON (para herramientas visuales).",
+    )
+    p_quim.add_argument(
+        "--tabla", action="store_true",
+        help="Vuelca la tabla periódica completa (con --json, en JSON).",
     )
 
     return parser
@@ -455,7 +474,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             args.sin_registro,
         )
     if args.comando == "quimica":
-        return _cmd_quimica(args.texto, args.como_json)
+        return _cmd_quimica(args.texto, args.como_json, args.tabla)
 
     # Sin subcomando: mostrar la ayuda.
     parser.print_help()

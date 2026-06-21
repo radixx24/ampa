@@ -2,7 +2,7 @@
 
 Identifica **elementos** (por nombre o fórmula de un solo elemento) y
 **compuestos** (por nombre curado o por fórmula), y los devuelve **estructurados**
-(símbolo, número atómico, composición) para usos visuales/adaptativos.
+(símbolo, número atómico, composición y masa molar) para usos visuales/adaptativos.
 """
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from typing import Dict, List, Tuple
 
 from .compounds import FORMULA_A_NOMBRE, NOMBRE_A_FORMULA
 from .elements import ELEMENTOS, NOMBRE_A_SIMBOLO, normalizar
-from .formulas import composicion_valida
+from .formulas import composicion_valida, masa_molar
 
 # Nombres de elemento demasiado comunes como palabra corriente: solo por fórmula.
 _AMBIGUOS = {"radio"}
@@ -39,6 +39,7 @@ class EntidadQuimica:
     simbolo: str = ""
     numero_atomico: int = 0
     composicion: Dict[str, int] = field(default_factory=dict)
+    masa_molar: float = 0.0
     texto: str = ""
 
     def to_dict(self) -> Dict[str, object]:
@@ -49,6 +50,7 @@ class EntidadQuimica:
             "simbolo": self.simbolo,
             "numero_atomico": self.numero_atomico,
             "composicion": self.composicion,
+            "masa_molar": self.masa_molar,
             "texto": self.texto,
         }
 
@@ -75,6 +77,10 @@ class ResultadoQuimica:
         }
 
 
+def _masa(composicion: Dict[str, int]) -> float:
+    return round(masa_molar(composicion), 3)
+
+
 def _solapa(span: Tuple[int, int], spans: List[Tuple[int, int]]) -> bool:
     inicio, fin = span
     return any(inicio < b and a < fin for a, b in spans)
@@ -93,11 +99,13 @@ def identificar(texto: str) -> ResultadoQuimica:
             formula = NOMBRE_A_FORMULA[nombre]
             clave = ("compuesto", formula)
             if clave not in entidades:
+                composicion = composicion_valida(formula) or {}
                 entidades[clave] = EntidadQuimica(
                     tipo="compuesto",
                     nombre=FORMULA_A_NOMBRE.get(formula, nombre),
                     formula=formula,
-                    composicion=composicion_valida(formula) or {},
+                    composicion=composicion,
+                    masa_molar=_masa(composicion),
                     texto=texto[match.start():match.end()],
                 )
 
@@ -114,11 +122,12 @@ def identificar(texto: str) -> ResultadoQuimica:
             simbolo = next(iter(composicion))
             clave = ("elemento", simbolo)
             if clave not in entidades:
-                z, nombre = ELEMENTOS[simbolo]
+                el = ELEMENTOS[simbolo]
                 entidades[clave] = EntidadQuimica(
-                    tipo="elemento", nombre=nombre, formula=candidato,
-                    simbolo=simbolo, numero_atomico=z,
-                    composicion=dict(composicion), texto=candidato,
+                    tipo="elemento", nombre=el.nombre, formula=candidato,
+                    simbolo=simbolo, numero_atomico=el.z,
+                    composicion=dict(composicion), masa_molar=_masa(composicion),
+                    texto=candidato,
                 )
         else:
             clave = ("compuesto", candidato)
@@ -126,7 +135,8 @@ def identificar(texto: str) -> ResultadoQuimica:
                 entidades[clave] = EntidadQuimica(
                     tipo="compuesto",
                     nombre=FORMULA_A_NOMBRE.get(candidato, ""),
-                    formula=candidato, composicion=composicion, texto=candidato,
+                    formula=candidato, composicion=composicion,
+                    masa_molar=_masa(composicion), texto=candidato,
                 )
 
     # 3. Elementos por nombre (omitiendo los que caen dentro de un compuesto).
@@ -136,10 +146,11 @@ def identificar(texto: str) -> ResultadoQuimica:
         simbolo = NOMBRE_A_SIMBOLO[match.group(0)]
         clave = ("elemento", simbolo)
         if clave not in entidades:
-            z, nombre = ELEMENTOS[simbolo]
+            el = ELEMENTOS[simbolo]
             entidades[clave] = EntidadQuimica(
-                tipo="elemento", nombre=nombre, formula=simbolo, simbolo=simbolo,
-                numero_atomico=z, composicion={simbolo: 1},
+                tipo="elemento", nombre=el.nombre, formula=simbolo, simbolo=simbolo,
+                numero_atomico=el.z, composicion={simbolo: 1},
+                masa_molar=_masa({simbolo: 1}),
                 texto=texto[match.start():match.end()],
             )
 

@@ -1,7 +1,7 @@
 """Pruebas del reconocimiento químico (chemistry)."""
 import unittest
 
-from ampa.chemistry import identificar
+from ampa.chemistry import ELEMENTOS, identificar, masa_molar, tabla
 from ampa.chemistry.formulas import composicion_valida, parsear_formula
 
 
@@ -26,6 +26,7 @@ class TestIdentificar(unittest.TestCase):
         agua = next(c for c in r.compuestos if c.formula == "H2O")
         self.assertEqual(agua.composicion, {"H": 2, "O": 1})
         self.assertEqual(agua.nombre, "agua")  # nombrado desde el diccionario
+        self.assertAlmostEqual(agua.masa_molar, 18.015, places=2)
 
     def test_elementos_por_nombre(self):
         r = identificar("El oxígeno y el sodio reaccionan.")
@@ -47,6 +48,22 @@ class TestIdentificar(unittest.TestCase):
     def test_sin_falsos_positivos_en_texto_comun(self):
         r = identificar("El gato corre rápido por el parque al anochecer.")
         self.assertFalse(r.hay())
+
+
+class TestDatos(unittest.TestCase):
+    def test_tabla_completa(self):
+        self.assertEqual(len(tabla()), 118)
+        self.assertEqual([e.z for e in tabla()], list(range(1, 119)))
+
+    def test_datos_de_elemento(self):
+        o = ELEMENTOS["O"]
+        self.assertEqual(o.z, 8)
+        self.assertEqual(o.categoria, "no metal")
+        self.assertEqual(o.grupo, 16)
+        self.assertAlmostEqual(o.masa, 15.999, places=2)
+
+    def test_masa_molar(self):
+        self.assertAlmostEqual(masa_molar({"H": 2, "O": 1}), 18.015, places=2)
 
 
 if __name__ == "__main__":

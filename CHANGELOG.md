@@ -44,6 +44,10 @@ versionado según [SemVer](https://semver.org/lang/es/).
 - **Capa epistémica** en `ampa responder`: cada respuesta indica su **confianza**
   (cobertura de términos + dominio, **ADR 0014**) y su **origen**, y señala la
   **química detectada** (integra `chemistry`). +1 prueba (**69** en total).
+- **Química visual-ready**: cada elemento incluye **masa, grupo, periodo y
+  categoría**; se calcula la **masa molar** de los compuestos; `ampa quimica
+  --tabla` vuelca la tabla periódica (con `--json`). Diccionario de compuestos
+  ampliado. +3 pruebas (**72** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.

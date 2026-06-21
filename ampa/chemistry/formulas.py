@@ -66,3 +66,8 @@ def composicion_valida(formula: str) -> Optional[Dict[str, int]]:
     if not composicion or any(sim not in ELEMENTOS for sim in composicion):
         return None
     return composicion
+
+
+def masa_molar(composicion: Dict[str, int]) -> float:
+    """Masa molar (g/mol) de una composición elemento → número de átomos."""
+    return sum(ELEMENTOS[sim].masa * n for sim, n in composicion.items())

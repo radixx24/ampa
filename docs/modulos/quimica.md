@@ -15,6 +15,8 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
 - Reconoce **elementos** por nombre (es) o por fórmula de un solo elemento (`O2`).
 - Reconoce **compuestos** por nombre curado o por **fórmula** (`H2O`, `Ca(OH)2`).
 - **Parsea** fórmulas a su composición (elemento → átomos), con paréntesis.
+- Calcula la **masa molar** y expone datos por elemento (masa, grupo, periodo,
+  categoría) para visualización.
 - Devuelve entidades estructuradas y serializables (`to_dict`, JSON).
 
 **No hace:**
@@ -29,7 +31,9 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
 
 - `ResultadoQuimica`: `elementos` y `compuestos` (`EntidadQuimica`), con `to_dict()`.
 - `EntidadQuimica`: `tipo`, `nombre`, `formula`, `simbolo`, `numero_atomico`,
-  `composicion`, `texto`.
+  `composicion`, `masa_molar`, `texto`.
+- `Elemento` (tabla periódica): `simbolo`, `z`, `nombre`, `masa`, `periodo`,
+  `grupo`, `categoria`; `tabla()` los devuelve todos y `ampa quimica --tabla` los vuelca.
 
 ## 5. Flujo interno
 
@@ -57,13 +61,13 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
 
 ## 9. Pruebas mínimas
 
-- `tests/test_chemistry.py` (7 casos): parseo con paréntesis, validación de
-  símbolos, compuestos por fórmula y por nombre, elementos por nombre, no
-  duplicar el elemento dentro de un compuesto y ausencia de falsos positivos.
+- `tests/test_chemistry.py` (10 casos): parseo con paréntesis, validación de
+  símbolos, compuestos por fórmula/nombre, elementos por nombre, no duplicar el
+  elemento dentro de un compuesto, ausencia de falsos positivos, y datos de la
+  tabla (118 elementos, masa molar, datos por elemento).
 - Ejecutar: `python -m unittest discover -s tests -t .`
 
 ## 10. Cambios pendientes
 
-- Ampliar el diccionario de compuestos y los sinónimos.
-- Masas atómicas y propiedades (para cálculos y visualización).
-- Usar la química detectada para enriquecer las respuestas (capa epistémica).
+- Ampliar aún más el diccionario de compuestos y los sinónimos.
+- Balanceo de reacciones y más propiedades (electronegatividad, estados).
