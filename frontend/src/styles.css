@@ -177,4 +177,17 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   color: var(--acento); margin: 0; padding: 10px; border-top: 1px solid var(--linea);
 }
 
+/* Temperatura, leyenda de polaridad y alertas de valencia */
+.temp { width: 80px; margin-bottom: 0; }
+.leyenda { font-size: 12px; color: var(--suave); display: inline-flex; align-items: center; flex-wrap: wrap; }
+.lp { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin: 0 3px 0 10px; }
+.alerta { color: var(--error); margin-left: 10px; font-size: 12px; }
+
+/* Grafo de conocimiento (estilo Obsidian) */
+.grafo {
+  display: block; width: 100%; height: auto; aspect-ratio: 560 / 380;
+  background: #0c1220; border: 1px solid var(--linea); border-radius: 10px;
+  cursor: pointer; touch-action: none;
+}
+
 .pie { text-align: center; color: var(--suave); font-size: 12px; margin-top: 26px; }

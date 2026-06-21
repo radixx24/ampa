@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "./api.js";
+import GrafoFilosofia from "./GrafoFilosofia.jsx";
 
 function Identificar() {
   const [texto, setTexto] = useState("Kant criticó el empirismo de Hume sobre el fenómeno.");
@@ -119,6 +120,7 @@ export default function Filosofia() {
         <Identificar />
         <Cuaderno />
       </div>
+      <GrafoFilosofia />
     </div>
   );
 }

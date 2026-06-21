@@ -170,7 +170,7 @@ Stdlib pura, con CORS. Despacho probado sin sockets (`manejar`).
 | `GET  /api/salud` | Estado y versión. |
 | `GET  /api/quimica/tabla` | Los 118 elementos (símbolo, Z, masa, grupo, periodo, categoría, radio). |
 | `POST /api/quimica/identificar` `{texto}` | Elementos y compuestos detectados. |
-| `POST /api/quimica/analizar` `{molécula}` | Fórmula, masa, **grupos**, **reacciones**. |
+| `POST /api/quimica/analizar` `{molécula}` | Fórmula, masa, **grupos**, **reacciones**, **valencia/polaridad**. |
 | `POST /api/quimica/reacciones` `{molécula}` | Reacciones plausibles. |
 | `POST /api/quimica/geometria` `{molécula}` | Coordenadas **3D** por átomo (con radio). |
 | `GET/POST /api/quimica/compuestos` | Listar / **guardar** compuestos. |
@@ -189,14 +189,14 @@ Dos **apartados**:
 
 - **Química**: tabla periódica interactiva (color por categoría, posición por
   grupo/periodo), **identificar** texto, y el **editor de enlaces de carbono**:
-  - Modos **construir / mover / borrar**, plantillas (agua, metano, benceno…),
-    **exportar PNG**.
-  - **🧊 Ver en 3D** — visor de molécula en 3D, **hecho desde cero** (proyección y
-    rotación a mano, sin librerías 3D); enlaces dobles/triples y tamaños por radio.
-  - **🎬 Combustión** — animación donde los **átomos se reorganizan** de reactivos a
-    productos (la materia se conserva), con la ecuación balanceada.
-- **Filosofía**: identificar texto y el **cuaderno/diccionario** (escribes
-  pensamientos → crecen los términos).
+  - Modos **construir / mover / borrar**, plantillas, **exportar PNG**.
+  - **Química viva**: enlaces coloreados por **polaridad**, átomos por **saturación
+    de valencia**, e input de **temperatura**.
+  - **🧊 Ver en 3D** — visor **hecho desde cero** (sin librerías 3D); enlaces
+    dobles/triples, tamaño por **radio** y **vibración térmica** con la temperatura.
+  - **🎬 Reacciones** — combustión (átomo a átomo), hidrogenación y neutralización.
+- **Filosofía**: identificar texto, el **cuaderno/diccionario** y un **grafo de
+  conocimiento** (estilo Obsidian) que conecta tus ideas.
 
 Detalle técnico en [docs/modulos/frontend.md](docs/modulos/frontend.md).
 

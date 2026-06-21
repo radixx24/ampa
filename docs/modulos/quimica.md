@@ -22,6 +22,8 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
 - Detecta **grupos funcionales** e infiere **reacciones** posibles (combustión
   balanceada, hidrogenación, neutralización…): el **editor de carbono**.
 - Genera **geometría 3D** (layout por fuerzas) para visualizar la molécula.
+- Analiza **enlaces**: **saturación de valencia** por átomo y **polaridad** por
+  electronegatividad (covalente no polar / polar / iónico).
 - Devuelve entidades estructuradas y serializables (`to_dict`, JSON).
 
 **No hace:**
@@ -38,7 +40,10 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
 - `EntidadQuimica`: `tipo`, `nombre`, `formula`, `simbolo`, `numero_atomico`,
   `composicion`, `masa_molar`, `texto`.
 - `Elemento` (tabla periódica): `simbolo`, `z`, `nombre`, `masa`, `periodo`,
-  `grupo`, `categoria`, `radio` (covalente, Å); `tabla()` los devuelve todos.
+  `grupo`, `categoria`, `radio` (covalente, Å), `electronegatividad` (Pauling),
+  `valencia` (típica); `tabla()` los devuelve todos.
+- `analizar_enlaces(mol)` → por átomo (valencia usada/típica, estado: libre /
+  saturado / sobreenlazado) y por enlace (Δ electronegatividad, polaridad).
 - `Molecula` (átomos + enlaces): `formula()`, `composicion()`, `masa_molar()`,
   `to_dict()`; se persiste con `guardar_compuesto` / `cargar_compuestos`.
 - `grupos_funcionales(mol)` → lista de grupos; `reacciones(mol)` → lista de
@@ -57,6 +62,8 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
 - **Reglas + datos antes que ML** (ADR 0013): explicable, portable y sin descargas.
 - **Validación estricta de fórmulas**: evita falsos positivos con palabras normales.
 - **Nombres muy ambiguos** (p. ej. «radio») se reconocen solo por fórmula.
+- **Datos de enlace orientativos** (electronegatividad de Pauling, valencia típica):
+  guían la construcción y colorean la polaridad; **no** simulan química real.
 - **Estructura lista para visualizar**: composición y número atómico por entidad.
 
 ## 7. Errores esperados
@@ -81,10 +88,12 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
   balanceada, halogenación, hidratación, deshidratación, neutralización…).
 - `tests/test_geometry.py` (4 casos): coordenadas por átomo, determinismo, molécula
   vacía y distancia de enlace razonable.
+- `tests/test_bonding.py` (4 casos): clasificación de polaridad y saturación de
+  valencia (agua, metano, sobreenlazado).
 - Ejecutar: `python -m unittest discover -s tests -t .`
 
 ## 10. Cambios pendientes
 
 - Ampliar aún más el diccionario de compuestos y los sinónimos.
 - Más tipos de reacción y balanceo general (no solo combustión).
-- Más propiedades por elemento (electronegatividad, estados).
+- Compatibilidad por temperatura/cargas iónicas más allá de lo orientativo.

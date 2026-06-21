@@ -98,6 +98,15 @@ versionado según [SemVer](https://semver.org/lang/es/).
   productos (conservación de la materia) con la ecuación balanceada en vivo.
 - **Documentación a fondo**: `README.md` maestro (qué hace cada cosa, para qué,
   cómo actúa y las consideraciones) y módulo `docs/modulos/frontend.md`.
+- **Química viva en el editor**: **electronegatividad** y **valencia** en los 118
+  elementos; `analizar_enlaces` (saturación de valencia + **polaridad** por Δ
+  electronegatividad) en `POST /api/quimica/analizar`. El editor colorea enlaces por
+  polaridad y átomos por saturación; input de **temperatura** que hace **vibrar** el
+  visor 3D. +4 pruebas (**115** en total).
+- **Animación de reacciones**: además de combustión, **hidrogenación** y
+  **neutralización**.
+- **🕸️ Grafo de conocimiento (estilo Obsidian)** en Filosofía: términos como nodos,
+  co-ocurrencia como aristas, con layout de fuerzas en vivo e interacción.
 - **`ampa ampakadabra`** ✨: un solo comando que **conjura web + API** — compila el
   frontend si hace falta, lo sirve junto a la API desde el **mismo servidor** (un
   artefacto portable) y abre el navegador. La API sirve el build de React con

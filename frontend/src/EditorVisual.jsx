@@ -14,6 +14,13 @@ const MODOS = [["construir", "✏️ Construir"], ["mover", "✋ Mover"], ["borr
 const W = 560;
 const H = 320;
 const R = 16;
+const POL_COLOR = {
+  "covalente no polar": "#7e889a",
+  "covalente polar": "#e5c07b",
+  "iónico": "#e06c75",
+  "n/d": "#555c66",
+};
+const SAT_COLOR = { saturado: "#6ee7b7", libre: "#e5c07b", sobreenlazado: "#f87171", "n/d": "#0e1116" };
 
 function benceno() {
   const cx = 280, cy = 160, Rc = 52, Rh = 92;
@@ -93,6 +100,7 @@ export default function EditorVisual() {
   const [guardados, setGuardados] = useState([]);
   const [mol3d, setMol3d] = useState(null);
   const [animMol, setAnimMol] = useState(null);
+  const [temp, setTemp] = useState(298);
 
   const cargar = () => api.listarCompuestos().then(setGuardados).catch(() => {});
   useEffect(() => { cargar(); }, []);
@@ -192,6 +200,11 @@ export default function EditorVisual() {
     atomos.some((a) => a.el === "C") &&
     atomos.some((a) => a.el === "H") &&
     atomos.every((a) => ["C", "H", "O"].includes(a.el));
+  const analisis = res && res.enlaces_analisis;
+  const tieneDobleCC = enlaces.some(
+    (b) => b.orden === 2 && atomos[b.a] && atomos[b.b] && atomos[b.a].el === "C" && atomos[b.b].el === "C"
+  );
+  const esAcido = res && res.grupos_funcionales && res.grupos_funcionales.includes("ácido carboxílico");
 
   return (
     <section className="card">
@@ -227,6 +240,21 @@ export default function EditorVisual() {
           </button>
         ))}
       </div>
+      <div className="paleta">
+        <span>Temp (K):</span>
+        <input
+          type="number" className="temp" value={temp} min={0} max={6000}
+          onChange={(e) => setTemp(Number(e.target.value) || 0)}
+        />
+        {analisis && (
+          <span className="leyenda">
+            <i className="lp" style={{ background: POL_COLOR["covalente no polar"] }} /> no polar
+            <i className="lp" style={{ background: POL_COLOR["covalente polar"] }} /> polar
+            <i className="lp" style={{ background: POL_COLOR["iónico"] }} /> iónico
+            {!analisis.estable && <b className="alerta">⚠ valencias</b>}
+          </span>
+        )}
+      </div>
       <p className="hint">
         {modo === "construir" && "Clic en el lienzo = átomo · clic en dos átomos = enlace"}
         {modo === "mover" && "Arrastra los átomos para reacomodarlos"}
@@ -251,6 +279,9 @@ export default function EditorVisual() {
           const ox = -dy / len;
           const oy = dx / len;
           const offsets = b.orden === 1 ? [0] : b.orden === 2 ? [-3, 3] : [-5, 0, 5];
+          const polColor = analisis && analisis.enlaces[i]
+            ? (POL_COLOR[analisis.enlaces[i].polaridad] || "#8a93a3")
+            : "#8a93a3";
           return (
             <g key={i}>
               <line
@@ -260,14 +291,14 @@ export default function EditorVisual() {
                 onClick={(e) => { e.stopPropagation(); borrarEnlace(i); }}
               />
               {offsets.map((o, k) => (
-                <line key={k} x1={A.x + ox * o} y1={A.y + oy * o} x2={B.x + ox * o} y2={B.y + oy * o} stroke="#8a93a3" strokeWidth="2" />
+                <line key={k} x1={A.x + ox * o} y1={A.y + oy * o} x2={B.x + ox * o} y2={B.y + oy * o} stroke={polColor} strokeWidth={analisis ? 2.6 : 2} />
               ))}
             </g>
           );
         })}
         {atomos.map((a, i) => (
           <g key={i} onClick={(e) => clicAtomo(e, i)} onPointerDown={(e) => onPointerDownAtomo(e, i)} style={{ cursor: modo === "mover" ? "grab" : "pointer" }}>
-            <circle cx={a.x} cy={a.y} r={R} fill={colorDe(a.el)} stroke={sel === i ? "#6ee7b7" : "#0e1116"} strokeWidth={sel === i ? 3 : 2} />
+            <circle cx={a.x} cy={a.y} r={R} fill={colorDe(a.el)} stroke={sel === i ? "#6ee7b7" : (analisis && analisis.atomos[i] ? (SAT_COLOR[analisis.atomos[i].estado] || "#0e1116") : "#0e1116")} strokeWidth={sel === i ? 3 : (analisis ? 2.6 : 2)} />
             <text x={a.x} y={a.y + 4} textAnchor="middle" fontSize="13" fontWeight="700" fill={TEXTO_OSCURO.has(a.el) ? "#1a1f27" : "#fff"}>
               {a.el}
             </text>
@@ -278,7 +309,9 @@ export default function EditorVisual() {
         <input className="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="nombre (opcional)" />
         <button onClick={analizar} disabled={!atomos.length}>Analizar</button>
         <button className="sec" onClick={() => setMol3d(molecula())} disabled={!atomos.length}>🧊 Ver en 3D</button>
-        <button className="sec" onClick={() => setAnimMol(molecula())} disabled={!combustible} title={combustible ? "" : "Necesita C y H"}>🎬 Combustión</button>
+        <button className="sec" onClick={() => setAnimMol({ mol: molecula(), tipo: "combustion" })} disabled={!combustible} title={combustible ? "" : "Necesita C y H"}>🎬 Combustión</button>
+        <button className="sec" onClick={() => setAnimMol({ mol: molecula(), tipo: "hidrogenacion" })} disabled={!tieneDobleCC} title={tieneDobleCC ? "" : "Necesita un C=C"}>🎬 Hidrogenación</button>
+        <button className="sec" onClick={() => setAnimMol({ mol: molecula(), tipo: "neutralizacion" })} disabled={!esAcido} title={esAcido ? "" : "Analiza un ácido carboxílico primero"}>🎬 Neutralización</button>
       </div>
       <div className="row">
         <button className="sec" onClick={guardar} disabled={!atomos.length}>Guardar</button>
@@ -286,8 +319,8 @@ export default function EditorVisual() {
         <button className="sec" onClick={limpiar}>Limpiar</button>
       </div>
       {error && <p className="err">{error}</p>}
-      {mol3d && <Visor3D molecula={mol3d} onCerrar={() => setMol3d(null)} />}
-      {animMol && <ReaccionAnimada molecula={animMol} onCerrar={() => setAnimMol(null)} />}
+      {mol3d && <Visor3D molecula={mol3d} temp={temp} onCerrar={() => setMol3d(null)} />}
+      {animMol && <ReaccionAnimada molecula={animMol.mol} tipo={animMol.tipo} onCerrar={() => setAnimMol(null)} />}
       {res && (
         <div className="result">
           <p className="formula"><b>{res.formula}</b> · {res.masa_molar} g/mol</p>

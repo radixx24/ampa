@@ -15,10 +15,12 @@ function oscurecer(hex, f = 0.42) {
   return `rgb(${Math.round(((n >> 16) & 255) * f)},${Math.round(((n >> 8) & 255) * f)},${Math.round((n & 255) * f)})`;
 }
 
-export default function Visor3D({ molecula, onCerrar }) {
+export default function Visor3D({ molecula, temp = 298, onCerrar }) {
   const canvasRef = useRef(null);
   const geoRef = useRef(null);
   const errRef = useRef("");
+  const tempRef = useRef(temp);
+  tempRef.current = temp;
   const estado = useRef({ rotX: 0.45, rotY: 0, auto: true, drag: false, lx: 0, ly: 0 });
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export default function Visor3D({ molecula, onCerrar }) {
     const frame = () => {
       const s = estado.current;
       if (s.auto && !s.drag) s.rotY += 0.012;
-      dibujar(ctx, canvasRef.current, geoRef.current, s.rotX, s.rotY, errRef.current);
+      dibujar(ctx, canvasRef.current, geoRef.current, s.rotX, s.rotY, errRef.current, tempRef.current, performance.now());
       raf = requestAnimationFrame(frame);
     };
     frame();
@@ -71,7 +73,7 @@ export default function Visor3D({ molecula, onCerrar }) {
   );
 }
 
-function dibujar(ctx, canvas, geo, rotX, rotY, err) {
+function dibujar(ctx, canvas, geo, rotX, rotY, err, temp, now) {
   const W = canvas.width;
   const H = canvas.height;
   const fondo = ctx.createLinearGradient(0, 0, 0, H);
@@ -89,15 +91,18 @@ function dibujar(ctx, canvas, geo, rotX, rotY, err) {
     return;
   }
   const cx = Math.cos(rotX), sx = Math.sin(rotX), cy = Math.cos(rotY), sy = Math.sin(rotY);
-  const pts = geo.atomos.map((a) => {
+  const amp = Math.min(8, (temp || 0) / 90); // vibración térmica ∝ temperatura
+  const pts = geo.atomos.map((a, i) => {
     const x1 = a.x * cy - a.z * sy;
     const z1 = a.x * sy + a.z * cy;
     const y1 = a.y * cx - z1 * sx;
     const z2 = a.y * sx + z1 * cx;
     const persp = 5 / (5 + z2);
+    const jx = Math.sin(now * 0.006 + i * 1.7) * amp;
+    const jy = Math.cos(now * 0.005 + i * 2.3) * amp;
     return {
       el: a.el, radio: a.radio || 0.7, z: z2, persp,
-      sx: W / 2 + x1 * ESCALA * persp, sy: H / 2 + y1 * ESCALA * persp,
+      sx: W / 2 + x1 * ESCALA * persp + jx, sy: H / 2 + y1 * ESCALA * persp + jy,
     };
   });
 

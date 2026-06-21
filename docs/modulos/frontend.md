@@ -15,11 +15,14 @@ sigue en el núcleo Python.
 **Hace:**
 - Renderiza los dos apartados y habla con la API por **HTTP/JSON** (`src/api.js`).
 - **Tabla periódica** interactiva (color por categoría, posición por grupo/periodo).
-- **Editor de enlaces**: construir / mover / borrar átomos y enlaces, plantillas y
-  exportar **PNG**.
-- **Visor 3D** de la molécula (proyección y rotación propias, sin librerías 3D).
-- **Animación de combustión** (los átomos se reorganizan; la materia se conserva).
-- **Cuaderno/diccionario** de filosofía (escribir pensamientos, ver términos).
+- **Editor de enlaces** con **química viva**: construir/mover/borrar, plantillas,
+  PNG, **enlaces coloreados por polaridad** y **átomos por saturación de valencia**,
+  e input de **temperatura**.
+- **Visor 3D** (sin librerías): enlaces dobles/triples, tamaño por radio y
+  **vibración térmica** según la temperatura.
+- **Animación de reacciones**: combustión (átomo a átomo), hidrogenación y
+  neutralización.
+- **Cuaderno/diccionario** + **grafo de conocimiento** (estilo Obsidian) de filosofía.
 
 **No hace:**
 - No contiene lógica de dominio: **toda** la química/filosofía vive en el núcleo y
@@ -46,9 +49,10 @@ sigue en el núcleo Python.
 | `api.js` | Cliente HTTP (`get`/`post`) y helper `slug`. |
 | `Quimica.jsx` | Tabla periódica + identificar + monta el editor. |
 | `EditorVisual.jsx` | Editor SVG de moléculas (modos, plantillas, PNG, botones 3D/animación). |
-| `Visor3D.jsx` | Visor 3D en `canvas` (rotación/proyección a mano). |
-| `ReaccionAnimada.jsx` | Animación de la combustión en `canvas`. |
-| `Filosofia.jsx` | Identificar + cuaderno/diccionario. |
+| `Visor3D.jsx` | Visor 3D en `canvas` (rotación/proyección a mano + vibración térmica). |
+| `ReaccionAnimada.jsx` | Animación de reacciones (combustión / hidrogenación / neutralización). |
+| `GrafoFilosofia.jsx` | Grafo de conocimiento (física en vivo) del diccionario. |
+| `Filosofia.jsx` | Identificar + cuaderno/diccionario + grafo. |
 | `styles.css` | Tema oscuro, sin librerías de estilo. |
 
 ## 6. Flujo interno (las dos joyas, a detalle)
@@ -85,6 +89,20 @@ sigue en el núcleo Python.
    los productos (con un arco y un **destello** central); los enlaces de reactivos
    se desvanecen y los de productos aparecen. Muestra la **ecuación balanceada**.
 
+### Química viva (editor)
+- Tras **Analizar**, el editor pide a la API el análisis de enlaces y **colorea**:
+  cada enlace por su **polaridad** (no polar / polar / iónico) y cada átomo por su
+  **saturación de valencia** (libre / saturado / sobreenlazado, con alerta global).
+- La **temperatura** (K) se pasa al visor 3D, que añade una **vibración** a los
+  átomos proporcional a `T` (a más calor, más agitación). Es visual y orientativo.
+
+### Grafo de conocimiento (`GrafoFilosofia`) — estilo Obsidian
+- Construye un grafo: **nodos** = términos del diccionario (tamaño por nº de
+  pensamientos), **aristas** = términos que **co-ocurren** en un mismo pensamiento.
+- Lo acomoda con un **layout de fuerzas en vivo** (repulsión + resortes + gravedad
+  al centro); al **clic** en un nodo resalta sus conexiones y lista los pensamientos
+  de ese término. Así organizas y *ves* tus ideas conectadas.
+
 ## 7. Errores esperados
 
 - API caída → el indicador marca "API offline"; cada panel muestra el error.
@@ -107,5 +125,5 @@ sigue en el núcleo Python.
 ## 10. Cambios pendientes
 
 - Arrastrar para **encadenar** átomos (crear átomo + enlace en un gesto).
-- Animar más reacciones (hidrogenación, neutralización) paso a paso.
 - Exportar la vista 3D como imagen y compartir moléculas por enlace.
+- Enriquecer el grafo (filtros, agrupar por época/corriente).
