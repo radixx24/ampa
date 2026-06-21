@@ -41,6 +41,9 @@ RAG, ADR 0002).
 ## 6. Decisiones de diseño
 
 - **BM25 léxico antes que embeddings** (ADR 0010): portable y explicable.
+- **Filtrado de palabras vacías** (stopwords): el ranking usa términos con
+  contenido y evita coincidencias espurias (preserva la honestidad: sin términos
+  relevantes → sin resultados).
 - **Citas siempre** (fuente + índice): honestidad epistémica y trazabilidad.
 - **Troceo por párrafos** con solapamiento: fragmentos legibles y citables.
 - **Reutiliza la percepción** para el dominio (cohesión entre módulos).

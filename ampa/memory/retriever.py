@@ -19,6 +19,19 @@ from .store import cargar_fragmentos
 
 _TOKEN = re.compile(r"[a-z0-9]+")
 
+# Palabras vacías (stopwords) del español, en forma sin acentos. Filtrarlas evita
+# coincidencias espurias por términos muy frecuentes ("que", "el", "de"...) y deja
+# que el ranking se base en las palabras con contenido.
+_VACIAS = frozenset(
+    "a al algo algunas algunos ante antes como con contra cual cuales cuando cuanto "
+    "cuanta cuantos cuantas de del desde donde e el ella ellas ellos en entre era "
+    "eran eres es esa esas ese eso esos esta estas este esto estos fue fueron ha han "
+    "has hasta hay he la las le les lo los mas me mi mis mucha muchas mucho muchos "
+    "muy nada ni no nos nosotras nosotros o os otra otras otro otros para pero poco "
+    "por porque que quien quienes se ser sera son soy su sus tambien tan tanto te ti "
+    "tiene tienen toda todas todo todos tu tus un una unas unos y ya yo".split()
+)
+
 
 def _sin_acentos(texto: str) -> str:
     descompuesto = unicodedata.normalize("NFKD", texto)
@@ -26,8 +39,9 @@ def _sin_acentos(texto: str) -> str:
 
 
 def tokenizar(texto: str) -> List[str]:
-    """Normaliza (minúsculas, sin acentos) y extrae los tokens alfanuméricos."""
-    return _TOKEN.findall(_sin_acentos(texto.lower()))
+    """Normaliza (minúsculas, sin acentos), tokeniza y descarta palabras vacías."""
+    crudos = _TOKEN.findall(_sin_acentos(texto.lower()))
+    return [token for token in crudos if token not in _VACIAS]
 
 
 @dataclass

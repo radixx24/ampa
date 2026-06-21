@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Optional, Sequence
 
 from .. import __version__
+from ..answer import responder
 from ..core import paths as paths_mod
 from ..core import platform_info
 from ..memory import (
@@ -151,6 +152,15 @@ def _cmd_memoria() -> int:
     return 0
 
 
+def _cmd_responder(consulta, k, detalle) -> int:
+    resp = responder(consulta, k)
+    print(resp.texto())
+    if detalle:
+        print("\n[diagnóstico]")
+        print(resp.diagnostico())
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ampa",
@@ -277,6 +287,19 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("memoria", help="Muestra el estado de la memoria documental.")
 
+    p_resp = sub.add_parser(
+        "responder", help="Responde una pregunta con fuentes de la memoria."
+    )
+    p_resp.add_argument("consulta", help="La pregunta.")
+    p_resp.add_argument(
+        "-k", type=int, default=3, help="Fragmentos a considerar como evidencia."
+    )
+    p_resp.add_argument(
+        "--detalle",
+        action="store_true",
+        help="Muestra el diagnóstico (percepción de la consulta + scores).",
+    )
+
     return parser
 
 
@@ -321,6 +344,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return _cmd_consultar(args.consulta, args.k)
     if args.comando == "memoria":
         return _cmd_memoria()
+    if args.comando == "responder":
+        return _cmd_responder(args.consulta, args.k, args.detalle)
 
     # Sin subcomando: mostrar la ayuda.
     parser.print_help()

@@ -23,6 +23,11 @@ versionado según [SemVer](https://semver.org/lang/es/).
   ranking léxico **BM25** (sin dependencias). Comandos `ampa recordar`,
   `ampa consultar` y `ampa memoria`. Módulo `docs/modulos/memoria.md` y
   **ADR 0010**. +6 pruebas (**50** en total).
+- **Respuesta con fuentes** (`ampa/answer/`) y comando `ampa responder`
+  (`--detalle`): une percepción y memoria para devolver una respuesta
+  **extractiva y citada**, honesta cuando no hay evidencia (no inventa). Incluye
+  filtrado de palabras vacías en la recuperación. Módulo
+  `docs/modulos/respuesta.md` y **ADR 0011**. +5 pruebas (**55** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.

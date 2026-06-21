@@ -57,6 +57,12 @@ class TestRetriever(unittest.TestCase):
             ingerir(texto=texto, fuente="multi.md", ruta=ruta, clasificar=False)
             self.assertEqual(len(recuperar("atomo enlace", k=2, ruta=ruta)), 2)
 
+    def test_consulta_solo_palabras_vacias_no_matchea(self):
+        with tempfile.TemporaryDirectory() as d:
+            ruta = Path(d) / "frag.jsonl"
+            ingerir(texto=QUIMICA, fuente="q.md", ruta=ruta, clasificar=False)
+            self.assertEqual(recuperar("que es el de la", ruta=ruta), [])
+
 
 if __name__ == "__main__":
     unittest.main()

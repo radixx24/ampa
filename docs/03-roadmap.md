@@ -6,7 +6,7 @@
 ## Fase 0 — Concepto rector ✅
 
 - [x] Definición, límites y arquitectura (`concepto-maestro.md` v0.2)
-- [x] Decisiones registradas (ADR 0001–0010)
+- [x] Decisiones registradas (ADR 0001–0011)
 
 ## Fase 1 — Documentación base ✅
 
@@ -29,11 +29,11 @@
 - [x] Recuperación contextual con **citas** (BM25 portable, ADR 0010) → `ampa consultar`
 - [ ] Embeddings + índice vectorial (segunda iteración; complementa a BM25)
 
-## Fase 4 — CLI funcional ⏳
+## Fase 4 — CLI funcional 🟡 (recuperación)
 
-- [ ] Preguntas y respuestas con fuentes
-- [ ] Modo diagnóstico
-- [ ] Integración con el motor (`llama.cpp`)
+- [x] Preguntas y respuestas con fuentes → `ampa responder` (extractiva y citada, ADR 0011)
+- [x] Modo diagnóstico → `ampa responder --detalle` (percepción + scores)
+- [ ] Integración con el motor (`llama.cpp`) para generar sobre las citas
 
 ## Fase 5 — Escriba seguro 🟡 (núcleo)
 
