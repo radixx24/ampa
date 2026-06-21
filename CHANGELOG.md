@@ -65,6 +65,10 @@ versionado según [SemVer](https://semver.org/lang/es/).
   el grafo de enlaces e infiere reacciones (**combustión balanceada**, hidrogenación,
   neutralización…); `ampa compuesto analizar` las muestra (con `--json`). Completa
   «los tres» del editor. +8 pruebas (**92** en total).
+- **API JSON portable** (`ampa/api/`, comando `ampa servir`): expone química y
+  filosofía por HTTP/JSON con **cero dependencias** (`http.server`) y CORS, lista
+  para un frontend React. Despacho puro y testeable (`manejar`). **ADR 0015** y
+  módulo `docs/modulos/api.md`. +7 pruebas (**99** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.

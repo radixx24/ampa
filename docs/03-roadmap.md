@@ -6,7 +6,7 @@
 ## Fase 0 — Concepto rector ✅
 
 - [x] Definición, límites y arquitectura (`concepto-maestro.md` v0.2)
-- [x] Decisiones registradas (ADR 0001–0014)
+- [x] Decisiones registradas (ADR 0001–0015)
 
 ## Fase 1 — Documentación base ✅
 

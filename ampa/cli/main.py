@@ -356,6 +356,13 @@ def _cmd_compuesto(accion, desde, como_json) -> int:
     return 0
 
 
+def _cmd_servir(puerto) -> int:
+    from ..api import servir
+
+    servir(puerto)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ampa",
@@ -583,6 +590,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--json", action="store_true", dest="como_json", help="Salida en JSON."
     )
 
+    p_serv = sub.add_parser(
+        "servir", help="Arranca la API JSON local (para el frontend)."
+    )
+    p_serv.add_argument(
+        "--puerto", type=int, default=8000, help="Puerto de escucha (def. 8000)."
+    )
+
     return parser
 
 
@@ -649,6 +663,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return _cmd_diccionario(args.termino, args.como_json)
     if args.comando == "compuesto":
         return _cmd_compuesto(args.accion, args.desde, args.como_json)
+    if args.comando == "servir":
+        return _cmd_servir(args.puerto)
 
     # Sin subcomando: mostrar la ayuda.
     parser.print_help()

@@ -35,3 +35,4 @@ Cada ADR sigue esta plantilla:
 | [0012](0012-orquestacion-ciclo.md) | Orquestación del ciclo: proponer por defecto, ejecutar con autorización | Aceptado |
 | [0013](0013-reconocimiento-quimico.md) | Reconocimiento químico por reglas y datos antes que ML/NER | Aceptado |
 | [0014](0014-confianza-por-cobertura.md) | Confianza por cobertura léxica y dominio, no por score absoluto | Aceptado |
+| [0015](0015-api-stdlib.md) | API JSON con biblioteca estándar antes que un framework | Aceptado |
