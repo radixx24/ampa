@@ -57,6 +57,12 @@ class TestApi(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn("combustión", {r["tipo"] for r in cuerpo})
 
+    def test_geometria_endpoint(self):
+        status, cuerpo = manejar("POST", "/api/quimica/geometria", ETANOL)
+        self.assertEqual(status, 200)
+        self.assertEqual(len(cuerpo["atomos"]), 9)
+        self.assertEqual(set(cuerpo["atomos"][0]), {"el", "x", "y", "z"})
+
 
 class TestEstatico(unittest.TestCase):
     def test_sirve_index_assets_y_fallback_spa(self):

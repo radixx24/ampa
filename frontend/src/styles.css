@@ -154,5 +154,23 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   margin: 6px 0; touch-action: none;
 }
 .nombre { width: auto; flex: 1 1 120px; margin-bottom: 0; }
+.plantillas {
+  width: auto; margin: 0 0 0 auto; padding: 5px 10px; border-radius: 8px;
+  background: var(--panel-2); color: var(--texto); border: 1px solid var(--linea);
+  font-size: 13px; cursor: pointer;
+}
+
+/* ---- Visor 3D ---- */
+.visor3d {
+  margin: 10px 0; border: 1px solid var(--linea); border-radius: 12px;
+  overflow: hidden; background: #0c1220;
+}
+.visor-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 8px 12px; border-bottom: 1px solid var(--linea); font-size: 13px;
+}
+.visor-top span { display: flex; gap: 6px; }
+.visor-top button { padding: 5px 10px; font-size: 12px; }
+.canvas3d { display: block; width: 100%; height: auto; touch-action: none; cursor: grab; }
 
 .pie { text-align: center; color: var(--suave); font-size: 12px; margin-top: 26px; }

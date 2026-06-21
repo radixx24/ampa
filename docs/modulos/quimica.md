@@ -21,6 +21,7 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
   compuestos** que tú alimentes (`ampa compuesto`).
 - Detecta **grupos funcionales** e infiere **reacciones** posibles (combustión
   balanceada, hidrogenación, neutralización…): el **editor de carbono**.
+- Genera **geometría 3D** (layout por fuerzas) para visualizar la molécula.
 - Devuelve entidades estructuradas y serializables (`to_dict`, JSON).
 
 **No hace:**
@@ -42,6 +43,7 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
   `to_dict()`; se persiste con `guardar_compuesto` / `cargar_compuestos`.
 - `grupos_funcionales(mol)` → lista de grupos; `reacciones(mol)` → lista de
   `Reaccion` (`tipo`, `ecuacion`, `descripcion`).
+- `geometria_3d(mol)` → coordenadas 3D por átomo (para el visor 3D).
 
 ## 5. Flujo interno
 
@@ -75,8 +77,10 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
   tabla (118 elementos, masa molar, datos por elemento).
 - `tests/test_molecules.py` (4 casos): fórmula de Hill, masa, validación y
   persistencia de compuestos.
-- `tests/test_carbon.py` (8 casos): grupos funcionales (alqueno, alcohol, ácido…)
-  y reacciones (combustión balanceada, hidrogenación, neutralización).
+- `tests/test_carbon.py` (11 casos): grupos funcionales y reacciones (combustión
+  balanceada, halogenación, hidratación, deshidratación, neutralización…).
+- `tests/test_geometry.py` (4 casos): coordenadas por átomo, determinismo, molécula
+  vacía y distancia de enlace razonable.
 - Ejecutar: `python -m unittest discover -s tests -t .`
 
 ## 10. Cambios pendientes

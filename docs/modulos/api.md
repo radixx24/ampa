@@ -29,6 +29,7 @@ frontend (p. ej. React), **sin dependencias** (`http.server`).
 - `GET  /api/salud`
 - `GET  /api/quimica/tabla` · `POST /api/quimica/identificar`
 - `POST /api/quimica/analizar` (molécula → fórmula, masa, grupos, reacciones)
+- `POST /api/quimica/reacciones` · `POST /api/quimica/geometria` (coordenadas 3D)
 - `GET/POST /api/quimica/compuestos` (listar / guardar)
 - `POST /api/filosofia/identificar` · `POST /api/filosofia/pensar`
 - `GET  /api/filosofia/diccionario`

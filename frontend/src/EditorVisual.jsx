@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "./api.js";
+import Visor3D from "./Visor3D.jsx";
 
 const PALETA = ["C", "H", "O", "N", "S", "Cl", "P", "F"];
 const COLOR = {
@@ -8,28 +9,88 @@ const COLOR = {
 };
 const colorDe = (el) => COLOR[el] || "#7a8290";
 const TEXTO_OSCURO = new Set(["H", "F", "S", "Cl"]);
-const MODOS = [
-  ["construir", "✏️ Construir"],
-  ["mover", "✋ Mover"],
-  ["borrar", "🗑 Borrar"],
-];
+const MODOS = [["construir", "✏️ Construir"], ["mover", "✋ Mover"], ["borrar", "🗑 Borrar"]];
 const W = 560;
 const H = 320;
 const R = 16;
+
+function benceno() {
+  const cx = 280, cy = 160, Rc = 52, Rh = 92;
+  const atomos = [];
+  const enlaces = [];
+  for (let k = 0; k < 6; k++) {
+    const a = ((-90 + k * 60) * Math.PI) / 180;
+    atomos.push({ el: "C", x: cx + Rc * Math.cos(a), y: cy + Rc * Math.sin(a) });
+  }
+  for (let k = 0; k < 6; k++) {
+    const a = ((-90 + k * 60) * Math.PI) / 180;
+    atomos.push({ el: "H", x: cx + Rh * Math.cos(a), y: cy + Rh * Math.sin(a) });
+  }
+  for (let k = 0; k < 6; k++) enlaces.push({ a: k, b: (k + 1) % 6, orden: k % 2 === 0 ? 2 : 1 });
+  for (let k = 0; k < 6; k++) enlaces.push({ a: k, b: 6 + k, orden: 1 });
+  return { nombre: "benceno", atomos, enlaces };
+}
+
+const PLANTILLAS = {
+  agua: {
+    nombre: "agua",
+    atomos: [{ el: "O", x: 280, y: 160 }, { el: "H", x: 232, y: 128 }, { el: "H", x: 328, y: 128 }],
+    enlaces: [{ a: 0, b: 1, orden: 1 }, { a: 0, b: 2, orden: 1 }],
+  },
+  metano: {
+    nombre: "metano",
+    atomos: [
+      { el: "C", x: 280, y: 160 }, { el: "H", x: 280, y: 96 }, { el: "H", x: 280, y: 224 },
+      { el: "H", x: 216, y: 160 }, { el: "H", x: 344, y: 160 },
+    ],
+    enlaces: [{ a: 0, b: 1, orden: 1 }, { a: 0, b: 2, orden: 1 }, { a: 0, b: 3, orden: 1 }, { a: 0, b: 4, orden: 1 }],
+  },
+  "dióxido de carbono": {
+    nombre: "dióxido de carbono",
+    atomos: [{ el: "O", x: 190, y: 160 }, { el: "C", x: 280, y: 160 }, { el: "O", x: 370, y: 160 }],
+    enlaces: [{ a: 0, b: 1, orden: 2 }, { a: 1, b: 2, orden: 2 }],
+  },
+  eteno: {
+    nombre: "eteno",
+    atomos: [
+      { el: "C", x: 248, y: 160 }, { el: "C", x: 312, y: 160 }, { el: "H", x: 208, y: 126 },
+      { el: "H", x: 208, y: 194 }, { el: "H", x: 352, y: 126 }, { el: "H", x: 352, y: 194 },
+    ],
+    enlaces: [
+      { a: 0, b: 1, orden: 2 }, { a: 0, b: 2, orden: 1 }, { a: 0, b: 3, orden: 1 },
+      { a: 1, b: 4, orden: 1 }, { a: 1, b: 5, orden: 1 },
+    ],
+  },
+  etanol: {
+    nombre: "etanol",
+    atomos: [
+      { el: "C", x: 214, y: 172 }, { el: "C", x: 274, y: 150 }, { el: "O", x: 334, y: 168 },
+      { el: "H", x: 364, y: 200 }, { el: "H", x: 178, y: 142 }, { el: "H", x: 188, y: 210 },
+      { el: "H", x: 214, y: 232 }, { el: "H", x: 262, y: 96 }, { el: "H", x: 304, y: 112 },
+    ],
+    enlaces: [
+      { a: 0, b: 1, orden: 1 }, { a: 1, b: 2, orden: 1 }, { a: 2, b: 3, orden: 1 },
+      { a: 0, b: 4, orden: 1 }, { a: 0, b: 5, orden: 1 }, { a: 0, b: 6, orden: 1 },
+      { a: 1, b: 7, orden: 1 }, { a: 1, b: 8, orden: 1 },
+    ],
+  },
+  benceno: benceno(),
+};
 
 export default function EditorVisual() {
   const svgRef = useRef(null);
   const [el, setEl] = useState("C");
   const [orden, setOrden] = useState(1);
   const [modo, setModo] = useState("construir");
-  const [atomos, setAtomos] = useState([]); // { el, x, y }
-  const [enlaces, setEnlaces] = useState([]); // { a, b, orden }
+  const [atomos, setAtomos] = useState([]);
+  const [enlaces, setEnlaces] = useState([]);
   const [sel, setSel] = useState(null);
   const [arrastrando, setArrastrando] = useState(null);
   const [nombre, setNombre] = useState("");
   const [res, setRes] = useState(null);
   const [error, setError] = useState("");
   const [guardados, setGuardados] = useState([]);
+  const [mol3d, setMol3d] = useState(null);
 
   const cargar = () => api.listarCompuestos().then(setGuardados).catch(() => {});
   useEffect(() => { cargar(); }, []);
@@ -62,17 +123,12 @@ export default function EditorVisual() {
   function borrarAtomo(i) {
     setAtomos(atomos.filter((_, j) => j !== i));
     setEnlaces(
-      enlaces
-        .filter((b) => b.a !== i && b.b !== i)
+      enlaces.filter((b) => b.a !== i && b.b !== i)
         .map((b) => ({ a: b.a > i ? b.a - 1 : b.a, b: b.b > i ? b.b - 1 : b.b, orden: b.orden }))
     );
-    setSel(null);
-    setRes(null);
+    setSel(null); setRes(null);
   }
-  function borrarEnlace(idx) {
-    setEnlaces(enlaces.filter((_, j) => j !== idx));
-    setRes(null);
-  }
+  function borrarEnlace(idx) { setEnlaces(enlaces.filter((_, j) => j !== idx)); setRes(null); }
 
   function onPointerDownAtomo(e, i) {
     if (modo !== "mover") return;
@@ -85,6 +141,15 @@ export default function EditorVisual() {
     setAtomos(atomos.map((a, j) => (j === arrastrando ? { ...a, x, y } : a)));
   }
   const finArrastre = () => setArrastrando(null);
+
+  function cargarPlantilla(clave) {
+    const p = PLANTILLAS[clave];
+    if (!p) return;
+    setAtomos(p.atomos.map((a) => ({ ...a })));
+    setEnlaces(p.enlaces.map((b) => ({ ...b })));
+    setNombre(p.nombre);
+    setSel(null); setRes(null);
+  }
 
   const molecula = () => ({
     nombre,
@@ -100,8 +165,25 @@ export default function EditorVisual() {
     try { setError(""); await api.guardarCompuesto(molecula()); cargar(); }
     catch (e) { setError("" + e); }
   }
-  function limpiar() {
-    setAtomos([]); setEnlaces([]); setSel(null); setRes(null); setError("");
+  function limpiar() { setAtomos([]); setEnlaces([]); setSel(null); setRes(null); setError(""); }
+
+  function exportarPNG() {
+    const xml = new XMLSerializer().serializeToString(svgRef.current);
+    const fuente = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = W * 2; c.height = H * 2;
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#0e1116";
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      const a = document.createElement("a");
+      a.download = (nombre || "molecula") + ".png";
+      a.href = c.toDataURL("image/png");
+      a.click();
+    };
+    img.src = fuente;
   }
 
   return (
@@ -114,6 +196,10 @@ export default function EditorVisual() {
             {etiqueta}
           </button>
         ))}
+        <select className="plantillas" defaultValue="" onChange={(e) => { cargarPlantilla(e.target.value); e.target.value = ""; }}>
+          <option value="" disabled>＋ Plantilla…</option>
+          {Object.keys(PLANTILLAS).map((k) => <option key={k} value={k}>{k}</option>)}
+        </select>
       </div>
       <div className="paleta">
         <span>Átomo:</span>
@@ -167,46 +253,32 @@ export default function EditorVisual() {
                 onClick={(e) => { e.stopPropagation(); borrarEnlace(i); }}
               />
               {offsets.map((o, k) => (
-                <line
-                  key={k}
-                  x1={A.x + ox * o} y1={A.y + oy * o}
-                  x2={B.x + ox * o} y2={B.y + oy * o}
-                  stroke="#8a93a3" strokeWidth="2"
-                />
+                <line key={k} x1={A.x + ox * o} y1={A.y + oy * o} x2={B.x + ox * o} y2={B.y + oy * o} stroke="#8a93a3" strokeWidth="2" />
               ))}
             </g>
           );
         })}
         {atomos.map((a, i) => (
-          <g
-            key={i}
-            onClick={(e) => clicAtomo(e, i)}
-            onPointerDown={(e) => onPointerDownAtomo(e, i)}
-            style={{ cursor: modo === "mover" ? "grab" : "pointer" }}
-          >
-            <circle
-              cx={a.x} cy={a.y} r={R} fill={colorDe(a.el)}
-              stroke={sel === i ? "#6ee7b7" : "#0e1116"} strokeWidth={sel === i ? 3 : 2}
-            />
-            <text
-              x={a.x} y={a.y + 4} textAnchor="middle" fontSize="13" fontWeight="700"
-              fill={TEXTO_OSCURO.has(a.el) ? "#1a1f27" : "#fff"}
-            >
+          <g key={i} onClick={(e) => clicAtomo(e, i)} onPointerDown={(e) => onPointerDownAtomo(e, i)} style={{ cursor: modo === "mover" ? "grab" : "pointer" }}>
+            <circle cx={a.x} cy={a.y} r={R} fill={colorDe(a.el)} stroke={sel === i ? "#6ee7b7" : "#0e1116"} strokeWidth={sel === i ? 3 : 2} />
+            <text x={a.x} y={a.y + 4} textAnchor="middle" fontSize="13" fontWeight="700" fill={TEXTO_OSCURO.has(a.el) ? "#1a1f27" : "#fff"}>
               {a.el}
             </text>
           </g>
         ))}
       </svg>
       <div className="row">
-        <input
-          className="nombre" value={nombre}
-          onChange={(e) => setNombre(e.target.value)} placeholder="nombre (opcional)"
-        />
+        <input className="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="nombre (opcional)" />
         <button onClick={analizar} disabled={!atomos.length}>Analizar</button>
+        <button className="sec" onClick={() => setMol3d(molecula())} disabled={!atomos.length}>🧊 Ver en 3D</button>
+      </div>
+      <div className="row">
         <button className="sec" onClick={guardar} disabled={!atomos.length}>Guardar</button>
+        <button className="sec" onClick={exportarPNG} disabled={!atomos.length}>🖼 PNG</button>
         <button className="sec" onClick={limpiar}>Limpiar</button>
       </div>
       {error && <p className="err">{error}</p>}
+      {mol3d && <Visor3D molecula={mol3d} onCerrar={() => setMol3d(null)} />}
       {res && (
         <div className="result">
           <p className="formula"><b>{res.formula}</b> · {res.masa_molar} g/mol</p>

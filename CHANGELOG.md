@@ -83,6 +83,14 @@ versionado según [SemVer](https://semver.org/lang/es/).
 - **Ejecutable único** (`packaging/build_exe.py`, PyInstaller): un binario que sirve
   **web + API** sin Python ni Node; el servidor localiza el frontend incrustado vía
   `sys._MEIPASS`. Verificado de extremo a extremo.
+- **🧊 Visor 3D de moléculas (desde cero, sin librerías)**: endpoint
+  `POST /api/quimica/geometria` (layout 3D por fuerzas, stdlib) + visor en `canvas`
+  con proyección y rotación **a mano** (gira solo; arrastras para rotar). Dibujas la
+  molécula en 2D y la ves girar en 3D. +5 pruebas (**111** en total).
+- **Editor**: **plantillas** (agua, metano, CO₂, eteno, etanol, benceno) y
+  **exportar PNG** de la molécula.
+- **CI** (`.github/workflows/build.yml`): compila el frontend, corre las pruebas y
+  genera el **ejecutable para Windows, macOS y Linux** en cada tag `v*`.
 - **`ampa ampakadabra`** ✨: un solo comando que **conjura web + API** — compila el
   frontend si hace falta, lo sirve junto a la API desde el **mismo servidor** (un
   artefacto portable) y abre el navegador. La API sirve el build de React con

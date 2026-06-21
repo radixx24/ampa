@@ -28,6 +28,7 @@ export const api = {
   tabla: () => get("/api/quimica/tabla"),
   identificarQuimica: (texto) => post("/api/quimica/identificar", { texto }),
   analizar: (molecula) => post("/api/quimica/analizar", molecula),
+  geometria: (molecula) => post("/api/quimica/geometria", molecula),
   listarCompuestos: () => get("/api/quimica/compuestos"),
   guardarCompuesto: (molecula) => post("/api/quimica/compuestos", molecula),
   identificarFilosofia: (texto) => post("/api/filosofia/identificar", { texto }),

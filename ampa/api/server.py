@@ -16,6 +16,7 @@ from typing import Callable, Dict, Optional, Tuple
 from .. import __version__
 from ..chemistry import (
     cargar_compuestos,
+    geometria_3d,
     grupos_funcionales,
     guardar_compuesto,
     reacciones,
@@ -42,6 +43,16 @@ def _reacciones(datos: dict) -> list:
     return [r.to_dict() for r in reacciones(mol)]
 
 
+def _geometria(datos: dict) -> dict:
+    mol = Molecula.from_dict(datos)
+    mol.validar()
+    return {
+        "atomos": geometria_3d(mol),
+        "enlaces": [list(e) for e in mol.enlaces],
+        "formula": mol.formula(),
+    }
+
+
 def _guardar_compuesto(datos: dict) -> dict:
     mol = Molecula.from_dict(datos)
     guardar_compuesto(mol)
@@ -66,6 +77,7 @@ _RUTAS: Dict[Tuple[str, str], Callable[[dict], object]] = {
     ).to_dict(),
     ("POST", "/api/quimica/analizar"): _analizar_molecula,
     ("POST", "/api/quimica/reacciones"): _reacciones,
+    ("POST", "/api/quimica/geometria"): _geometria,
     ("GET", "/api/quimica/compuestos"): lambda d: [
         m.to_dict() for m in cargar_compuestos()
     ],
