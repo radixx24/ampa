@@ -27,6 +27,7 @@ from ..memory import (
     ruta_memoria,
 )
 from ..perception import journal, perceive
+from ..philosophy import identificar as identificar_filosofia
 from ..scribe import writer as scribe
 
 
@@ -233,6 +234,31 @@ def _cmd_quimica(texto, como_json, tabla) -> int:
     return 0
 
 
+def _cmd_filosofia(texto, como_json) -> int:
+    import json
+
+    resultado = identificar_filosofia(texto)
+    if como_json:
+        print(json.dumps(resultado.to_dict(), ensure_ascii=False, indent=2))
+        return 0
+    if not resultado.hay():
+        print("No se identificaron entidades filosóficas.")
+        return 0
+    if resultado.filosofos:
+        print("Filósofos:")
+        for f in resultado.filosofos:
+            print(f"  - {f.nombre} ({f.epoca}; {f.categoria})")
+    if resultado.corrientes:
+        print("Corrientes:")
+        for c in resultado.corrientes:
+            print(f"  - {c.nombre}")
+    if resultado.conceptos:
+        print("Conceptos:")
+        for c in resultado.conceptos:
+            print(f"  - {c.nombre} ({c.categoria})")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ampa",
@@ -417,6 +443,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Vuelca la tabla periódica completa (con --json, en JSON).",
     )
 
+    p_filo = sub.add_parser(
+        "filosofia", help="Identifica filósofos, corrientes y conceptos en un texto."
+    )
+    p_filo.add_argument("texto", help="El texto a analizar.")
+    p_filo.add_argument(
+        "--json", action="store_true", dest="como_json",
+        help="Salida en JSON (para herramientas visuales).",
+    )
+
     return parser
 
 
@@ -475,6 +510,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         )
     if args.comando == "quimica":
         return _cmd_quimica(args.texto, args.como_json, args.tabla)
+    if args.comando == "filosofia":
+        return _cmd_filosofia(args.texto, args.como_json)
 
     # Sin subcomando: mostrar la ayuda.
     parser.print_help()

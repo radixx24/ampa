@@ -48,6 +48,10 @@ versionado según [SemVer](https://semver.org/lang/es/).
   categoría**; se calcula la **masa molar** de los compuestos; `ampa quimica
   --tabla` vuelca la tabla periódica (con `--json`). Diccionario de compuestos
   ampliado. +3 pruebas (**72** en total).
+- **Reconocimiento de filosofía** (`ampa/philosophy/`) y comando `ampa filosofia`
+  (`--json`): identifica **filósofos** (época y corriente), **corrientes** y
+  **conceptos** (rama). Módulo `docs/modulos/filosofia.md`. Cierra «base de
+  filosofía» y «pruebas por dominio» de la Fase 6. +5 pruebas (**77** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.

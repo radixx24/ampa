@@ -46,8 +46,8 @@
 ## Fase 6 — Dominio químico-filosófico ⏳
 
 - [x] Base de **química**: tabla periódica + compuestos + reconocedor (`ampa/chemistry/`, `ampa quimica`, ADR 0013)
-- [ ] Base curada de **filosofía**
-- [ ] Pruebas por dominio
+- [x] Base de **filosofía**: filósofos, corrientes y conceptos (`ampa/philosophy/`, `ampa filosofia`)
+- [x] Pruebas por dominio (química y filosofía)
 - [x] Capa epistémica: origen y confianza por respuesta (`ampa responder`, ADR 0014)
 
 ## Fase 7 — Evaluación ⏳
