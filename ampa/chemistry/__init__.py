@@ -6,6 +6,7 @@ tabla periódica de 118 elementos y un parser de fórmulas. Sin dependencias.
 """
 from .elements import ELEMENTOS, Elemento, tabla  # noqa: F401
 from .formulas import composicion_valida, masa_molar, parsear_formula  # noqa: F401
+from .bonding import analizar_enlaces, polaridad  # noqa: F401
 from .geometry import geometria_3d  # noqa: F401
 from .groups import grupos_funcionales  # noqa: F401
 from .reactions import Reaccion, reacciones  # noqa: F401

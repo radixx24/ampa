@@ -15,6 +15,7 @@ from typing import Callable, Dict, Optional, Tuple
 
 from .. import __version__
 from ..chemistry import (
+    analizar_enlaces,
     cargar_compuestos,
     geometria_3d,
     grupos_funcionales,
@@ -34,6 +35,7 @@ def _analizar_molecula(datos: dict) -> dict:
     salida = mol.to_dict()
     salida["grupos_funcionales"] = grupos_funcionales(mol)
     salida["reacciones"] = [r.to_dict() for r in reacciones(mol)]
+    salida["enlaces_analisis"] = analizar_enlaces(mol)
     return salida
 
 

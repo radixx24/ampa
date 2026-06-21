@@ -34,6 +34,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(cuerpo["formula"], "C2H6O")
         self.assertIn("alcohol", cuerpo["grupos_funcionales"])
         self.assertTrue(cuerpo["reacciones"])
+        self.assertIn("enlaces_analisis", cuerpo)
 
     def test_identificar_filosofia(self):
         status, cuerpo = manejar("POST", "/api/filosofia/identificar", {"texto": "Kant y el idealismo"})

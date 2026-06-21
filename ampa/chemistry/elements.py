@@ -31,6 +31,8 @@ class Elemento:
     grupo: int  # 1–18; 0 para lantánidos/actínidos del bloque f
     categoria: str
     radio: float  # radio covalente en ångström (Cordero et al. 2008)
+    electronegatividad: float  # escala de Pauling (0.0 = no definida)
+    valencia: int  # valencia covalente típica (0 = no definida)
 
     def to_dict(self) -> Dict[str, object]:
         return {
@@ -42,6 +44,8 @@ class Elemento:
             "grupo": self.grupo,
             "categoria": self.categoria,
             "radio": self.radio,
+            "electronegatividad": self.electronegatividad,
+            "valencia": self.valencia,
         }
 
 
@@ -188,9 +192,38 @@ _RADIO_COVALENTE: Dict[str, float] = {
     "Nh": 1.36, "Fl": 1.43, "Mc": 1.62, "Lv": 1.75, "Ts": 1.65, "Og": 1.57,
 }
 
+# Electronegatividad de Pauling (0.0 si no está bien definida).
+_ELECTRONEGATIVIDAD: Dict[str, float] = {
+    "H": 2.20, "Li": 0.98, "Be": 1.57, "B": 2.04, "C": 2.55, "N": 3.04, "O": 3.44,
+    "F": 3.98, "Na": 0.93, "Mg": 1.31, "Al": 1.61, "Si": 1.90, "P": 2.19, "S": 2.58,
+    "Cl": 3.16, "K": 0.82, "Ca": 1.00, "Sc": 1.36, "Ti": 1.54, "V": 1.63, "Cr": 1.66,
+    "Mn": 1.55, "Fe": 1.83, "Co": 1.88, "Ni": 1.91, "Cu": 1.90, "Zn": 1.65, "Ga": 1.81,
+    "Ge": 2.01, "As": 2.18, "Se": 2.55, "Br": 2.96, "Kr": 3.00, "Rb": 0.82, "Sr": 0.95,
+    "Y": 1.22, "Zr": 1.33, "Nb": 1.60, "Mo": 2.16, "Tc": 1.90, "Ru": 2.20, "Rh": 2.28,
+    "Pd": 2.20, "Ag": 1.93, "Cd": 1.69, "In": 1.78, "Sn": 1.96, "Sb": 2.05, "Te": 2.10,
+    "I": 2.66, "Xe": 2.60, "Cs": 0.79, "Ba": 0.89, "La": 1.10, "Ce": 1.12, "Hf": 1.30,
+    "Ta": 1.50, "W": 2.36, "Re": 1.90, "Os": 2.20, "Ir": 2.20, "Pt": 2.28, "Au": 2.54,
+    "Hg": 2.00, "Tl": 1.62, "Pb": 2.33, "Bi": 2.02, "Po": 2.00, "At": 2.20, "Rn": 2.20,
+    "Fr": 0.79, "Ra": 0.90, "Ac": 1.10, "Th": 1.30, "Pa": 1.50, "U": 1.38, "Np": 1.36,
+    "Pu": 1.28,
+}
+
+# Valencia covalente típica (número usual de enlaces; 0 si no aplica).
+_VALENCIA: Dict[str, int] = {
+    "H": 1, "Li": 1, "Be": 2, "B": 3, "C": 4, "N": 3, "O": 2, "F": 1, "Na": 1, "Mg": 2,
+    "Al": 3, "Si": 4, "P": 3, "S": 2, "Cl": 1, "K": 1, "Ca": 2, "Zn": 2, "Ga": 3,
+    "Ge": 4, "As": 3, "Se": 2, "Br": 1, "Rb": 1, "Sr": 2, "Ag": 1, "Cd": 2, "In": 3,
+    "Sn": 4, "Sb": 3, "Te": 2, "I": 1, "Cs": 1, "Ba": 2,
+}
+
 # símbolo → Elemento
 ELEMENTOS: Dict[str, Elemento] = {
-    sim: Elemento(z, sim, nombre, masa, periodo, grupo, categoria, _RADIO_COVALENTE.get(sim, 1.5))
+    sim: Elemento(
+        z, sim, nombre, masa, periodo, grupo, categoria,
+        _RADIO_COVALENTE.get(sim, 1.5),
+        _ELECTRONEGATIVIDAD.get(sim, 0.0),
+        _VALENCIA.get(sim, 0),
+    )
     for (z, sim, nombre, masa, periodo, grupo, categoria) in _DATOS
 }
 
