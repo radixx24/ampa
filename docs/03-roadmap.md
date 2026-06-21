@@ -43,7 +43,7 @@
 - [x] Modo simulación (`--simular`) y bloqueo por riesgo alto (`--forzar` para autorizar)
 - [ ] Bitácora de cambios (los resultados ya son auditables vía `ResultadoEscritura`)
 
-## Fase 6 — Dominio químico-filosófico ⏳
+## Fase 6 — Dominio químico-filosófico ✅
 
 - [x] Base de **química**: tabla periódica + compuestos + reconocedor (`ampa/chemistry/`, `ampa quimica`, ADR 0013)
 - [x] Base de **filosofía**: filósofos, corrientes y conceptos (`ampa/philosophy/`, `ampa filosofia`)
