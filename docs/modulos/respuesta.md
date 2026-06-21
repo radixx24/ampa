@@ -1,13 +1,14 @@
 # Módulo: answer (respuesta con fuentes)
 
 > Documentado según la plantilla del Concepto Maestro §12.
-> Código: `ampa/answer/` · Pruebas: `tests/test_answer.py` · Decisión: ADR 0011
+> Código: `ampa/answer/` · Pruebas: `tests/test_answer.py` · Decisiones: ADR 0011 y 0014
 
 ## 1. Propósito
 
 Responder preguntas **con fuentes**: unir percepción y memoria para devolver una
-respuesta **fundamentada y citada** a partir de los apuntes (Concepto Maestro
-§5–§7; RAG, ADR 0002). Primera capa funcional de la CLI (Fase 4).
+respuesta **fundamentada, citada, con su confianza y origen** a partir de los
+apuntes (Concepto Maestro §5–§7; RAG, ADR 0002). Primera capa funcional de la
+CLI (Fase 4).
 
 ## 2. Responsabilidad exacta
 
@@ -15,6 +16,8 @@ respuesta **fundamentada y citada** a partir de los apuntes (Concepto Maestro
 - **Percibe** la consulta (dominio, riesgo) reutilizando `perception`.
 - **Recupera** los fragmentos más relevantes de la memoria (BM25, con citas).
 - **Compone** una respuesta extractiva: lidera con la mejor evidencia y sus citas.
+- Estima la **confianza** (cobertura de términos + dominio) e indica el **origen**.
+- Señala la **química detectada** en la respuesta (elementos y compuestos).
 - Es **honesta**: si no hay evidencia, lo declara y **no inventa**.
 
 **No hace:**
@@ -29,8 +32,9 @@ respuesta **fundamentada y citada** a partir de los apuntes (Concepto Maestro
 
 ## 4. Salidas
 
-- `Respuesta` (dataclass): `consulta`, `evento`, `resultados`; con `dominio`,
-  `riesgo`, `hay_evidencia()`, `fuentes()`, `texto()` y `diagnostico()`.
+- `Respuesta` (dataclass): `consulta`, `evento`, `resultados`, `confianza`,
+  `quimica`; con `dominio`, `riesgo`, `hay_evidencia()`, `fuentes()`/`origen()`,
+  `texto()` y `diagnostico()`.
 
 ## 5. Flujo interno
 
@@ -43,7 +47,9 @@ respuesta **fundamentada y citada** a partir de los apuntes (Concepto Maestro
 - **Recuperación extractiva antes que generación** (ADR 0011): citas literales,
   trazables y portables; la generación con modelo se añadirá sobre la misma base.
 - **Honestidad por defecto**: sin evidencia → se declara, no se inventa.
-- **Reutiliza percepción + memoria**: la respuesta es la unión de ambas capas.
+- **Confianza por cobertura + dominio** (ADR 0014), no por score absoluto:
+  estable e independiente del tamaño del corpus.
+- **Reutiliza percepción + memoria + química**: la respuesta une las tres capas.
 
 ## 7. Errores esperados
 
@@ -56,12 +62,13 @@ respuesta **fundamentada y citada** a partir de los apuntes (Concepto Maestro
 
 ## 9. Pruebas mínimas
 
-- `tests/test_answer.py` (4 casos): respuesta con cita y dominio, honestidad sin
-  evidencia, pregunta fuera de tema y diagnóstico.
+- `tests/test_answer.py` (5 casos): respuesta con cita, dominio y **confianza**,
+  honestidad sin evidencia, pregunta fuera de tema, diagnóstico y **química
+  detectada**.
 - Ejecutar: `python -m unittest discover -s tests -t .`
 
 ## 10. Cambios pendientes
 
 - **Generación con modelo** (`llama.cpp`) sobre los fragmentos citados.
 - Síntesis de varias fuentes en una respuesta redactada (conservando las citas).
-- Umbral de confianza configurable y filtrado por dominio.
+- Calibrar la confianza con más señales y permitir filtrado por dominio.

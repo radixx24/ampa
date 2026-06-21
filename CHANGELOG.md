@@ -41,6 +41,9 @@ versionado según [SemVer](https://semver.org/lang/es/).
   los entrega estructurados (símbolo, Z, composición) para usos visuales. Incluye
   tabla periódica (118) y parser de fórmulas. Módulo `docs/modulos/quimica.md` y
   **ADR 0013**. +7 pruebas (**68** en total).
+- **Capa epistémica** en `ampa responder`: cada respuesta indica su **confianza**
+  (cobertura de términos + dominio, **ADR 0014**) y su **origen**, y señala la
+  **química detectada** (integra `chemistry`). +1 prueba (**69** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.

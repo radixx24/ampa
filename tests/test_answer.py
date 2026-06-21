@@ -24,7 +24,9 @@ class TestResponder(unittest.TestCase):
             self.assertEqual(resp.dominio, "quimica")
             self.assertIn("covalente", resp.texto())
             self.assertIn("[apuntes.md#0]", resp.texto())
-            self.assertIn("[apuntes.md#0]", resp.fuentes())
+            self.assertIn("[apuntes.md#0]", resp.origen())
+            self.assertIn(resp.confianza, {"alta", "media"})  # evidencia + dominio
+            self.assertIn("Confianza:", resp.texto())
 
     def test_sin_evidencia_es_honesto(self):
         with tempfile.TemporaryDirectory() as d:
@@ -33,6 +35,7 @@ class TestResponder(unittest.TestCase):
             self.assertFalse(resp.hay_evidencia())
             self.assertIn("No encuentro nada", resp.texto())
             self.assertEqual(resp.fuentes(), [])
+            self.assertEqual(resp.confianza, "nula")
 
     def test_diagnostico_incluye_evento_y_scores(self):
         with tempfile.TemporaryDirectory() as d:
@@ -48,6 +51,19 @@ class TestResponder(unittest.TestCase):
             resp = responder("quien gano el mundial de futbol", ruta=ruta)
             self.assertFalse(resp.hay_evidencia())
             self.assertIn("No encuentro nada", resp.texto())
+
+    def test_detecta_quimica_en_la_respuesta(self):
+        with tempfile.TemporaryDirectory() as d:
+            ruta = Path(d) / "frag.jsonl"
+            ingerir(
+                texto="El agua (H2O) contiene oxígeno e hidrógeno.",
+                fuente="quim.md",
+                ruta=ruta,
+            )
+            resp = responder("háblame del agua", ruta=ruta)
+            self.assertTrue(resp.quimica.hay())
+            self.assertIn("H2O", {c.formula for c in resp.quimica.compuestos})
+            self.assertIn("Química detectada", resp.texto())
 
 
 if __name__ == "__main__":
