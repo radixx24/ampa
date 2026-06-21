@@ -328,13 +328,26 @@ def _cmd_compuesto(accion, desde, como_json) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     if accion == "analizar":
+        from ..chemistry.groups import grupos_funcionales
+        from ..chemistry.reactions import reacciones
+
+        grupos = grupos_funcionales(mol)
+        reax = reacciones(mol)
         if como_json:
-            print(json.dumps(mol.to_dict(), ensure_ascii=False, indent=2))
+            datos_mol = mol.to_dict()
+            datos_mol["grupos_funcionales"] = grupos
+            datos_mol["reacciones"] = [r.to_dict() for r in reax]
+            print(json.dumps(datos_mol, ensure_ascii=False, indent=2))
         else:
             print(f"{mol.nombre or '(sin nombre)'}: {mol.formula()}")
             print(f"  masa molar: {round(mol.masa_molar(), 3)} g/mol")
             comp = ", ".join(f"{s}×{n}" for s, n in mol.composicion().items())
             print(f"  composición: {comp}")
+            print(f"  grupos funcionales: {', '.join(grupos) or '(ninguno)'}")
+            if reax:
+                print("  reacciones posibles:")
+                for r in reax:
+                    print(f"    · {r.tipo}: {r.ecuacion}")
         return 0
     moleculas.guardar_compuesto(mol)
     print(

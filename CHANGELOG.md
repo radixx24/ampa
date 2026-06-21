@@ -60,6 +60,11 @@ versionado según [SemVer](https://semver.org/lang/es/).
   (átomos + enlaces) deriva fórmula (Hill), composición y masa molar; `ampa
   compuesto guardar|listar|analizar` **guarda tus compuestos** (JSON portable).
   Base del editor de enlaces de carbono. +4 pruebas (**84** en total).
+- **Editor de carbono — grupos funcionales y reacciones** (`ampa/chemistry/groups.py`
+  y `reactions.py`): detecta grupos (alcohol, ácido, alqueno, cetona, amina…) sobre
+  el grafo de enlaces e infiere reacciones (**combustión balanceada**, hidrogenación,
+  neutralización…); `ampa compuesto analizar` las muestra (con `--json`). Completa
+  «los tres» del editor. +8 pruebas (**92** en total).
 - **Núcleo portable** (`ampa/core/`): detección de plataforma (`platform_info.py`)
   y rutas multiplataforma (`paths.py`), solo con biblioteca estándar.
 - **CLI portable** (`ampa/cli/`): comandos `info`, `version` y `paths`.
