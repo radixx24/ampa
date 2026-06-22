@@ -29,6 +29,12 @@ export const api = {
   identificarQuimica: (texto) => post("/api/quimica/identificar", { texto }),
   analizar: (molecula) => post("/api/quimica/analizar", molecula),
   geometria: (molecula) => post("/api/quimica/geometria", molecula),
+  balancear: (reactivos, productos) =>
+    post("/api/quimica/balancear", { reactivos, productos }),
+  proyectar: (reactivos, productos, temperatura) =>
+    post("/api/quimica/proyectar", { reactivos, productos, temperatura }),
+  compatibilidad: (a, b, temperatura) =>
+    post("/api/quimica/compatibilidad", { a, b, temperatura }),
   listarCompuestos: () => get("/api/quimica/compuestos"),
   guardarCompuesto: (molecula) => post("/api/quimica/compuestos", molecula),
   identificarFilosofia: (texto) => post("/api/filosofia/identificar", { texto }),

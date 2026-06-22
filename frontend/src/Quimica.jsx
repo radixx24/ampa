@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { api, slug } from "./api.js";
 import EditorVisual from "./EditorVisual.jsx";
+import Proyeccion from "./Proyeccion.jsx";
+import Compatibilidad from "./Compatibilidad.jsx";
 
 function TablaPeriodica() {
   const [els, setEls] = useState([]);
@@ -103,6 +105,10 @@ export default function Quimica() {
       <TablaPeriodica />
       <Identificar />
       <EditorVisual />
+      <div className="columnas">
+        <Proyeccion />
+        <Compatibilidad />
+      </div>
     </div>
   );
 }
