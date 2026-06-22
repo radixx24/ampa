@@ -16,10 +16,14 @@ from typing import Callable, Dict, Optional, Tuple
 from .. import __version__
 from ..chemistry import (
     analizar_enlaces,
+    balancear,
     cargar_compuestos,
+    compatibilidad,
+    ecuacion,
     geometria_3d,
     grupos_funcionales,
     guardar_compuesto,
+    proyectar,
     reacciones,
     tabla,
 )
@@ -61,6 +65,52 @@ def _guardar_compuesto(datos: dict) -> dict:
     return {"guardado": True, "nombre": mol.nombre, "formula": mol.formula()}
 
 
+def _especies(valor: object) -> list:
+    """Normaliza reactivos/productos a una lista de fórmulas (acepta lista o texto)."""
+    if isinstance(valor, str):
+        partes = valor.replace("+", ",").split(",")
+    elif isinstance(valor, (list, tuple)):
+        partes = [str(v) for v in valor]
+    else:
+        partes = []
+    return [p.strip() for p in partes if p and p.strip()]
+
+
+def _temperatura(datos: dict) -> float:
+    try:
+        return float(datos.get("temperatura", 298.15))
+    except (TypeError, ValueError):
+        return 298.15
+
+
+def _balancear(datos: dict) -> dict:
+    reactivos = _especies(datos.get("reactivos"))
+    productos = _especies(datos.get("productos"))
+    coefs = balancear(reactivos, productos)
+    if coefs is None:
+        return {"ok": False, "razon": "no se pudo balancear (¿faltan o sobran especies?)"}
+    cr, cp = coefs
+    return {
+        "ok": True,
+        "ecuacion": ecuacion(reactivos, productos, coefs),
+        "coeficientes": {"reactivos": cr, "productos": cp},
+    }
+
+
+def _proyectar(datos: dict) -> dict:
+    return proyectar(
+        _especies(datos.get("reactivos")),
+        _especies(datos.get("productos")),
+        _temperatura(datos),
+    )
+
+
+def _compatibilidad(datos: dict) -> dict:
+    return compatibilidad(
+        str(datos.get("a", "")), str(datos.get("b", "")), _temperatura(datos)
+    )
+
+
 def _pensar(datos: dict) -> dict:
     pensamiento = notebook.agregar(datos.get("texto", ""), datos.get("terminos"))
     return pensamiento.to_dict()
@@ -80,6 +130,9 @@ _RUTAS: Dict[Tuple[str, str], Callable[[dict], object]] = {
     ("POST", "/api/quimica/analizar"): _analizar_molecula,
     ("POST", "/api/quimica/reacciones"): _reacciones,
     ("POST", "/api/quimica/geometria"): _geometria,
+    ("POST", "/api/quimica/balancear"): _balancear,
+    ("POST", "/api/quimica/proyectar"): _proyectar,
+    ("POST", "/api/quimica/compatibilidad"): _compatibilidad,
     ("GET", "/api/quimica/compuestos"): lambda d: [
         m.to_dict() for m in cargar_compuestos()
     ],

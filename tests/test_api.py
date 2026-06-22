@@ -64,6 +64,33 @@ class TestApi(unittest.TestCase):
         self.assertEqual(len(cuerpo["atomos"]), 9)
         self.assertEqual(set(cuerpo["atomos"][0]), {"el", "x", "y", "z", "radio"})
 
+    def test_balancear_endpoint(self):
+        status, cuerpo = manejar(
+            "POST", "/api/quimica/balancear",
+            {"reactivos": "CH4, O2", "productos": ["CO2", "H2O"]},
+        )
+        self.assertEqual(status, 200)
+        self.assertTrue(cuerpo["ok"])
+        self.assertEqual(cuerpo["ecuacion"], "CH4 + 2 O2 → CO2 + 2 H2O")
+
+    def test_proyectar_endpoint(self):
+        status, cuerpo = manejar(
+            "POST", "/api/quimica/proyectar",
+            {"reactivos": ["Na", "H2O"], "productos": ["NaOH", "H2"], "temperatura": 298.15},
+        )
+        self.assertEqual(status, 200)
+        self.assertTrue(cuerpo["ok"])
+        self.assertTrue(cuerpo["espontanea"])
+        self.assertLess(cuerpo["dG"], 0)
+
+    def test_compatibilidad_endpoint(self):
+        status, cuerpo = manejar(
+            "POST", "/api/quimica/compatibilidad", {"a": "Na", "b": "Cl"}
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(cuerpo["tipo_enlace"], "iónico")
+        self.assertEqual(cuerpo["producto"], "NaCl")
+
 
 class TestEstatico(unittest.TestCase):
     def test_sirve_index_assets_y_fallback_spa(self):
