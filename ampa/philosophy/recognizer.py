@@ -101,3 +101,20 @@ def identificar(texto: str) -> ResultadoFilosofia:
     orden = {"filósofo": 0, "corriente": 1, "concepto": 2}
     ordenadas = sorted(entidades.values(), key=lambda e: (orden[e.tipo], e.nombre))
     return ResultadoFilosofia(entidades=ordenadas)
+
+
+def catalogo() -> Dict[str, object]:
+    """Catálogo navegable de la base de filosofía (para explorar y aprender).
+
+    Devuelve filósofos (con época y corriente), conceptos (con rama) y corrientes,
+    ya ordenados, para que el frontend los muestre sin tener que escribir texto.
+    """
+    filosofos = [{"nombre": n, "epoca": e, "corriente": c} for (n, e, c) in FILOSOFOS.values()]
+    filosofos.sort(key=lambda f: (f["epoca"], f["nombre"]))
+    conceptos = [{"nombre": n, "rama": r} for (n, r) in CONCEPTOS.values()]
+    conceptos.sort(key=lambda c: (c["rama"], c["nombre"]))
+    return {
+        "filosofos": filosofos,
+        "conceptos": conceptos,
+        "corrientes": sorted(CORRIENTES.values()),
+    }

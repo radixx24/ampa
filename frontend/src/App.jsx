@@ -3,18 +3,66 @@ import { api } from "./api.js";
 import Quimica from "./Quimica.jsx";
 import Filosofia from "./Filosofia.jsx";
 
+const PASOS = {
+  quimica: [
+    ["1", "Toca la tabla", "Haz clic en cualquier elemento y mira sus datos. Los colores son su familia."],
+    ["2", "Dibuja una molécula", "En el editor, clic = átomo, y une dos átomos para enlazarlos. Prueba una plantilla."],
+    ["3", "Proyecta y juega", "¿Se puede crear? Mira el ΔG. ¿Dos elementos se llevan? Pruébalos. Gíralo en 3D."],
+  ],
+  filosofia: [
+    ["1", "Explora", "Navega filósofos, corrientes y conceptos. Toca uno para saber más."],
+    ["2", "Escribe lo que piensas", "En el cuaderno guarda tus ideas; AMPA arma tu diccionario personal."],
+    ["3", "Mira tus conexiones", "El grafo conecta tus ideas como un mapa mental que se ordena solo."],
+  ],
+};
+
+function Intro({ tab, onCerrar }) {
+  return (
+    <section className="intro">
+      <div className="intro-top">
+        <div>
+          <h2>{tab === "quimica" ? "Juega con la materia 🧪" : "Piensa en voz alta 📚"}</h2>
+          <p>
+            {tab === "quimica"
+              ? "Construye moléculas, mira qué reacciones harían y descubre —con termodinámica de verdad— si algo puede existir. No necesitas saber química: explora y aprende sobre la marcha."
+              : "Explora a los grandes pensadores, escribe tus propias ideas y velas conectarse en un grafo vivo. Aquí la filosofía se navega y se construye."}
+          </p>
+        </div>
+        <button className="cerrar-intro" onClick={onCerrar} title="Ocultar guía" aria-label="Ocultar">✕</button>
+      </div>
+      <div className="pasos">
+        {PASOS[tab].map(([num, titulo, desc]) => (
+          <div className="paso" key={num}>
+            <span className="num">{num}</span>
+            <b>{titulo}</b>
+            <span>{desc}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function App() {
   const [tab, setTab] = useState("quimica");
   const [salud, setSalud] = useState(null);
+  const [verGuia, setVerGuia] = useState(
+    () => localStorage.getItem("ampa_guia_off") !== "1"
+  );
 
   useEffect(() => {
     api.salud().then(setSalud).catch(() => setSalud(false));
   }, []);
 
+  function ocultarGuia() {
+    setVerGuia(false);
+    localStorage.setItem("ampa_guia_off", "1");
+  }
+
   return (
     <div className="app">
       <header className="topbar">
-        <h1 className="marca">AMPA</h1>
+        <h1 className="marca"><span className="punto" /> AMPA</h1>
         <nav className="tabs">
           <button className={tab === "quimica" ? "activo" : ""} onClick={() => setTab("quimica")}>
             🧪 Química
@@ -24,11 +72,24 @@ export default function App() {
           </button>
         </nav>
         <span className={"estado " + (salud ? "ok" : salud === false ? "mal" : "")}>
-          {salud ? `API v${salud.version}` : salud === false ? "API offline" : "conectando…"}
+          {salud ? `conectado · v${salud.version}` : salud === false ? "API offline" : "conectando…"}
         </span>
       </header>
+
+      {verGuia ? (
+        <Intro tab={tab} onCerrar={ocultarGuia} />
+      ) : (
+        <button className="ghost ver-guia" onClick={() => setVerGuia(true)} style={{ marginBottom: 14 }}>
+          ? Mostrar guía rápida
+        </button>
+      )}
+
       <main className="contenido">{tab === "quimica" ? <Quimica /> : <Filosofia />}</main>
-      <footer className="pie">AMPA · local y portable · sin dependencias en el núcleo</footer>
+
+      <footer className="pie">
+        AMPA · local y portable · sin dependencias en el núcleo ·{" "}
+        <a href="https://github.com/radixx24/ampa" target="_blank" rel="noreferrer">código</a>
+      </footer>
     </div>
   );
 }

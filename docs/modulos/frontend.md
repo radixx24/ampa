@@ -45,8 +45,9 @@ sigue en el núcleo Python.
 
 | Archivo | Qué hace |
 |---|---|
-| `App.jsx` | Cabecera, pestañas (Química/Filosofía), estado de salud de la API. |
-| `api.js` | Cliente HTTP (`get`/`post`) y helper `slug`. |
+| `App.jsx` | Cabecera, pestañas, estado de la API y **guía rápida** (onboarding). |
+| `api.js` | Cliente HTTP (`get`/`post`, base **mismo origen** en prod) y helper `slug`. |
+| `Explorar.jsx` | Catálogo navegable de filosofía (por época/rama) → siembra el cuaderno. |
 | `Quimica.jsx` | Tabla periódica + identificar + editor + proyección + compatibilidad. |
 | `EditorVisual.jsx` | Editor SVG de moléculas (modos, plantillas, PNG, **encadenar**, 3D/animación). |
 | `Visor3D.jsx` | Visor 3D en `canvas` (rotación/proyección a mano + vibración térmica + PNG). |
@@ -125,6 +126,23 @@ sigue en el núcleo Python.
 - **Agrupar por época/corriente**: pide `POST /api/filosofia/clasificar` y **colorea**
   los nodos por su grupo (época del filósofo / corriente / rama del concepto), con
   una **leyenda**. Los términos no reconocidos quedan en «otro».
+
+### Explorar filosofía (`Explorar`) — aprender sin escribir
+- Pide `GET /api/filosofia/catalogo` y muestra **filósofos** (agrupados por época),
+  **corrientes** y **conceptos** (por rama) como tarjetas/etiquetas.
+- Al tocar uno, **siembra el cuaderno** con ese término (lo enfoca y lo pone en
+  «sobre»): el flujo es **explorar → escribir → ver el grafo**. Cierra el apartado
+  de filosofía (ya no solo identifica texto: ahora se navega y se aprende).
+
+### Diseño e interacción (estética Vercel)
+- **Paleta monocroma** (negro, grises, un acento azul) con **bordes finos**, tipografía
+  apretada y mucho aire; tokens en `:root` (`styles.css`). Botón primario blanco
+  sobre negro, secundarios con borde.
+- **Responsivo**: rejillas que se apilan, topbar que envuelve, lienzos con
+  `aspect-ratio` (se adaptan a cualquier ancho) y *media queries* a 860/680 px.
+- **Intuitivo**: una **guía rápida** (3 pasos por apartado, recordada en
+  `localStorage`), **subtítulos** que explican cada tarjeta, leyenda de la tabla
+  periódica y estados vacíos que invitan a actuar.
 
 ## 7. Errores esperados
 

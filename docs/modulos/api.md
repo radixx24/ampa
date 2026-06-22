@@ -36,6 +36,7 @@ frontend (p. ej. React), **sin dependencias** (`http.server`).
 - `GET/POST /api/quimica/compuestos` (listar / guardar)
 - `POST /api/filosofia/identificar` · `POST /api/filosofia/pensar`
 - `GET  /api/filosofia/diccionario` · `POST /api/filosofia/clasificar`
+- `GET  /api/filosofia/catalogo` (filósofos, corrientes y conceptos para explorar)
 - `GET  /*` → frontend compilado (SPA), si existe `frontend/dist`.
 
 Arranque: `ampa servir` (solo API/estáticos) o `ampa ampakadabra` ✨ (compila el
@@ -64,9 +65,9 @@ frontend si falta, sirve web + API y abre el navegador).
 
 ## 9. Pruebas mínimas
 
-- `tests/test_api.py` (15 casos): salud, tabla, identificar, analizar, reacciones,
+- `tests/test_api.py` (16 casos): salud, tabla, identificar, analizar, reacciones,
   geometría, **balancear**, **proyectar**, **compatibilidad**, **clasificar**,
-  filosofía, estáticos, 404 y 400 — sobre `manejar` (sin sockets).
+  **catálogo**, filosofía, estáticos, 404 y 400 — sobre `manejar` (sin sockets).
 - Ejecutar: `python -m unittest discover -s tests -t .`
 
 ## 10. Cambios pendientes

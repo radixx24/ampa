@@ -49,6 +49,13 @@ class TestApi(unittest.TestCase):
         self.assertEqual(cuerpo["Nietzsche"]["tipo"], "filósofo")
         self.assertEqual(cuerpo["gato"]["grupo"], "otro")
 
+    def test_catalogo_filosofia(self):
+        status, cuerpo = manejar("GET", "/api/filosofia/catalogo")
+        self.assertEqual(status, 200)
+        self.assertGreater(len(cuerpo["filosofos"]), 20)
+        self.assertIn("epoca", cuerpo["filosofos"][0])
+        self.assertTrue(cuerpo["corrientes"] and cuerpo["conceptos"])
+
     def test_ruta_desconocida(self):
         status, _ = manejar("GET", "/api/no-existe")
         self.assertEqual(status, 404)

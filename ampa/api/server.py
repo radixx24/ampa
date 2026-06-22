@@ -29,6 +29,7 @@ from ..chemistry import (
 )
 from ..chemistry import identificar as identificar_quimica
 from ..chemistry.molecules import Molecula
+from ..philosophy import catalogo as catalogo_filosofia
 from ..philosophy import identificar as identificar_filosofia
 from ..philosophy import notebook
 
@@ -164,6 +165,7 @@ _RUTAS: Dict[Tuple[str, str], Callable[[dict], object]] = {
     ("POST", "/api/filosofia/pensar"): _pensar,
     ("GET", "/api/filosofia/diccionario"): _diccionario,
     ("POST", "/api/filosofia/clasificar"): _clasificar,
+    ("GET", "/api/filosofia/catalogo"): lambda d: catalogo_filosofia(),
 }
 
 

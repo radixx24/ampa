@@ -182,6 +182,7 @@ Stdlib pura, con CORS. Despacho probado sin sockets (`manejar`).
 | `POST /api/filosofia/pensar` `{texto, terminos}` | Guarda un pensamiento. |
 | `GET  /api/filosofia/diccionario` | Diccionario personal. |
 | `POST /api/filosofia/clasificar` `{terminos}` | Clasifica términos (época/corriente) para el grafo. |
+| `GET  /api/filosofia/catalogo` | Filósofos, corrientes y conceptos para **explorar**. |
 | `GET  /*` | El frontend compilado (SPA). |
 
 Molécula = `{ "nombre", "atomos": ["C","H",…], "enlaces": [[a,b,orden],…] }`.
@@ -203,8 +204,13 @@ Dos **apartados**:
   - **🎬 Reacciones** — combustión (átomo a átomo), hidrogenación y neutralización.
   - **🔮 Proyección termodinámica** — reactivos→productos + temperatura → **ΔG** y
     veredicto de si **puede existir**; y **🧲 compatibilidad** entre dos elementos.
-- **Filosofía**: identificar texto, el **cuaderno/diccionario** y un **grafo de
-  conocimiento** (estilo Obsidian) con **buscador** y **agrupado por época/corriente**.
+- **Filosofía**: **explorar** la base (filósofos por época, corrientes, conceptos) →
+  **escribir** en tu cuaderno/diccionario → **ver** tus ideas conectadas en un
+  **grafo** (estilo Obsidian) con buscador y agrupado por época/corriente.
+
+Diseño con **estética Vercel** (monocromo, bordes finos), **responsivo** (móvil y
+escritorio) y una **guía rápida** para empezar sin saber nada. El cliente usa el
+**mismo origen** que sirve la web, así que funciona en cualquier puerto.
 
 Detalle técnico en [docs/modulos/frontend.md](docs/modulos/frontend.md).
 

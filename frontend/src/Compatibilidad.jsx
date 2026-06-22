@@ -7,16 +7,16 @@ const PARES = [
 
 // Color por tipo de enlace.
 const ENLACE_COLOR = {
-  "iónico": "#fbbf24",
-  "covalente polar": "#60a5fa",
-  "covalente no polar": "#6ee7b7",
+  "iónico": "#f5a623",
+  "covalente polar": "#3291ff",
+  "covalente no polar": "#0cce6b",
   "metálico": "#c084fc",
-  "inerte": "#9aa7b4",
+  "inerte": "#a1a1a1",
 };
 
 const REACT_COLOR = {
-  "muy alta": "#f87171", "alta": "#fb923c", "media": "#fbbf24",
-  "baja": "#6ee7b7", "nula": "#9aa7b4",
+  "muy alta": "#ff5c5c", "alta": "#fb923c", "media": "#f5a623",
+  "baja": "#0cce6b", "nula": "#a1a1a1",
 };
 
 export default function Compatibilidad() {

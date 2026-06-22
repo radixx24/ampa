@@ -124,6 +124,18 @@ versionado según [SemVer](https://semver.org/lang/es/).
 - **Grafo enriquecido**: **buscador** (resalta/atenúa) y **agrupar por
   época/corriente** con leyenda de colores (`POST /api/filosofia/clasificar`).
   +1 prueba (**143** en total).
+- **🎨 Rediseño con estética Vercel**: paleta monocroma (negro/grises + acento azul),
+  bordes finos, tipografía apretada y mucho aire; sistema de diseño con tokens en
+  `styles.css`. **Responsivo** (móvil y escritorio) y **guía rápida** de onboarding
+  (3 pasos por apartado) con subtítulos que explican cada tarjeta.
+- **🧭 Filosofía concluida**: nuevo `Explorar` (catálogo navegable de filósofos por
+  época, corrientes y conceptos por rama) que **siembra el cuaderno** al tocarlo
+  (flujo explorar → escribir → grafo). Endpoint `GET /api/filosofia/catalogo`.
+  +1 prueba (**144** en total).
+- **Cliente al mismo origen**: en producción la web llama a la API en su **propio
+  origen** (cualquier puerto), no a un `127.0.0.1:8000` fijo.
+- **Arreglo**: el grafo ya no rompía la pestaña de Filosofía cuando el diccionario
+  estaba vacío (se protege el `canvas` antes de dibujar).
 - **`ampa ampakadabra`** ✨: un solo comando que **conjura web + API** — compila el
   frontend si hace falta, lo sirve junto a la API desde el **mismo servidor** (un
   artefacto portable) y abre el navegador. La API sirve el build de React con

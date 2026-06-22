@@ -147,11 +147,13 @@ export default function GrafoFilosofia() {
   useEffect(() => { vistaRef.current = { sel, filtro, colores }; }, [sel, filtro, colores]);
 
   useEffect(() => {
-    const ctx = canvasRef.current.getContext("2d");
     let raf;
     const frame = () => {
-      paso(grafoRef.current);
-      dibujar(ctx, grafoRef.current, vistaRef.current);
+      const cv = canvasRef.current;  // puede no existir si el diccionario está vacío
+      if (cv) {
+        paso(grafoRef.current);
+        dibujar(cv.getContext("2d"), grafoRef.current, vistaRef.current);
+      }
       raf = requestAnimationFrame(frame);
     };
     frame();

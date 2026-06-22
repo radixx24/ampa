@@ -13,9 +13,9 @@ const EJEMPLOS = [
 
 // Color del veredicto.
 const VERED = {
-  "espontánea": { c: "#6ee7b7", txt: "✅ ESPONTÁNEA", sub: "puede ocurrir sola (ΔG < 0)" },
-  "no espontánea": { c: "#f87171", txt: "❌ NO ESPONTÁNEA", sub: "la inversa es la favorable (ΔG > 0)" },
-  "en equilibrio": { c: "#fbbf24", txt: "⚖️ EN EQUILIBRIO", sub: "ΔG ≈ 0" },
+  "espontánea": { c: "#0cce6b", txt: "✅ ESPONTÁNEA", sub: "puede ocurrir sola (ΔG < 0)" },
+  "no espontánea": { c: "#ff5c5c", txt: "❌ NO ESPONTÁNEA", sub: "la inversa es la favorable (ΔG > 0)" },
+  "en equilibrio": { c: "#f5a623", txt: "⚖️ EN EQUILIBRIO", sub: "ΔG ≈ 0" },
 };
 
 export default function Proyeccion() {

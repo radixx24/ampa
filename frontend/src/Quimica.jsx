@@ -33,18 +33,29 @@ function TablaPeriodica() {
   return (
     <section className="card tabla-card">
       <h3>Tabla periódica</h3>
+      <p className="sub">Los 118 elementos. El color es su familia química. Toca uno para ver sus datos. {sel ? "" : "👇"}</p>
       {error && <p className="err">{error}</p>}
       <div className="tabla">{principales.map(Tile)}</div>
       <div className="fbloque">{fblock.map(Tile)}</div>
-      {sel && (
+      {sel ? (
         <div className="detalle">
           <span className="detalle-sim">{sel.simbolo}</span>
           <div>
             <b>{sel.nombre}</b> · Z={sel.numero_atomico} · {sel.masa} u
             <div className="detalle-meta">
               {sel.categoria} · periodo {sel.periodo} · grupo {sel.grupo || "—"}
+              {sel.electronegatividad ? ` · EN ${sel.electronegatividad}` : ""}
             </div>
           </div>
+        </div>
+      ) : (
+        <div className="leyenda-cat">
+          {[["no-metal", "no metal"], ["gas-noble", "gas noble"], ["alcalino", "alcalino"],
+            ["alcalinoterreo", "alcalinotérreo"], ["transicion", "transición"], ["metaloide", "metaloide"],
+            ["halogeno", "halógeno"], ["post-transicion", "post-transición"], ["lantanido", "lantánido"],
+            ["actinido", "actínido"]].map(([c, l]) => (
+            <span key={c}><i className={"cat-" + c} />{l}</span>
+          ))}
         </div>
       )}
     </section>
@@ -67,7 +78,8 @@ function Identificar() {
 
   return (
     <section className="card">
-      <h3>Identificar química</h3>
+      <h3>🔍 Identificar química</h3>
+      <p className="sub">Escribe cualquier texto y AMPA detecta los elementos y compuestos (por nombre o fórmula).</p>
       <textarea rows={3} value={texto} onChange={(e) => setTexto(e.target.value)} />
       <button onClick={run}>Identificar</button>
       {error && <p className="err">{error}</p>}

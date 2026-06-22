@@ -1,5 +1,9 @@
-// Cliente de la API de AMPA. La URL base se puede sobreescribir con VITE_AMPA_API.
-const BASE = import.meta.env.VITE_AMPA_API || "http://127.0.0.1:8000";
+// Cliente de la API de AMPA. En producción usa el MISMO origen que sirve la web
+// (funciona en cualquier puerto); en desarrollo (vite) apunta al servidor local.
+// Se puede forzar con VITE_AMPA_API.
+const BASE =
+  import.meta.env.VITE_AMPA_API ||
+  (import.meta.env.DEV ? "http://127.0.0.1:8000" : "");
 
 async function get(path) {
   const r = await fetch(BASE + path);
@@ -41,6 +45,7 @@ export const api = {
   pensar: (texto, terminos) => post("/api/filosofia/pensar", { texto, terminos }),
   diccionario: () => get("/api/filosofia/diccionario"),
   clasificar: (terminos) => post("/api/filosofia/clasificar", { terminos }),
+  catalogoFilosofia: () => get("/api/filosofia/catalogo"),
 };
 
 // Normaliza una categoría a una clase CSS (sin acentos ni espacios).

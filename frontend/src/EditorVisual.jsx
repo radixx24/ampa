@@ -249,7 +249,8 @@ export default function EditorVisual() {
 
   return (
     <section className="card">
-      <h3>Editor de enlaces de carbono</h3>
+      <h3>⚛️ Editor de moléculas</h3>
+      <p className="sub">Dibuja tu molécula: clic en el lienzo crea un átomo, y al unir dos átomos los enlazas. Luego analízala, mírala en 3D o anímala. ¿Apenas empiezas? Usa una plantilla.</p>
       <div className="paleta">
         <span>Modo:</span>
         {MODOS.map(([m, etiqueta]) => (
