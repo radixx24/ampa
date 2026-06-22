@@ -40,6 +40,7 @@ export const api = {
   identificarFilosofia: (texto) => post("/api/filosofia/identificar", { texto }),
   pensar: (texto, terminos) => post("/api/filosofia/pensar", { texto, terminos }),
   diccionario: () => get("/api/filosofia/diccionario"),
+  clasificar: (terminos) => post("/api/filosofia/clasificar", { terminos }),
 };
 
 // Normaliza una categoría a una clase CSS (sin acentos ni espacios).

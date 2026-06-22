@@ -189,6 +189,13 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   background: #0c1220; border: 1px solid var(--linea); border-radius: 10px;
   cursor: pointer; touch-action: none;
 }
+.grafo-ctrl { align-items: center; gap: 8px; margin-bottom: 8px; }
+.buscador { margin-bottom: 0; flex: 1; }
+.grafo-ctrl button { white-space: nowrap; font-size: 12.5px; padding: 8px 12px; }
+button.sec.on { outline: 1px solid var(--acento); color: var(--acento); }
+.leyenda-grupos { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+.leyenda-grupos .lg { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--suave); }
+.leyenda-grupos .lg i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
 
 /* ---- Proyección termodinámica y compatibilidad ---- */
 .ejemplos, .pares { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }

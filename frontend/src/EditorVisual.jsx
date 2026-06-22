@@ -94,6 +94,9 @@ export default function EditorVisual() {
   const [enlaces, setEnlaces] = useState([]);
   const [sel, setSel] = useState(null);
   const [arrastrando, setArrastrando] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const cadena = useRef(null);
+  const suprimir = useRef(false);
   const [nombre, setNombre] = useState("");
   const [res, setRes] = useState(null);
   const [error, setError] = useState("");
@@ -111,6 +114,7 @@ export default function EditorVisual() {
   }
 
   function clicLienzo(e) {
+    if (suprimir.current) { suprimir.current = false; return; }  // soltó un encadenado
     if (modo !== "construir") return;
     const [x, y] = coords(e);
     setAtomos([...atomos, { el, x, y }]);
@@ -119,6 +123,7 @@ export default function EditorVisual() {
 
   function clicAtomo(e, i) {
     e.stopPropagation();
+    if (suprimir.current) { suprimir.current = false; return; }
     if (modo === "borrar") { borrarAtomo(i); return; }
     if (modo !== "construir") return;
     if (sel === null) { setSel(i); return; }
@@ -141,16 +146,52 @@ export default function EditorVisual() {
   function borrarEnlace(idx) { setEnlaces(enlaces.filter((_, j) => j !== idx)); setRes(null); }
 
   function onPointerDownAtomo(e, i) {
-    if (modo !== "mover") return;
     e.stopPropagation();
-    setArrastrando(i);
+    if (modo === "mover") { setArrastrando(i); return; }
+    if (modo === "construir") {  // inicia un posible "encadenar" (arrastre)
+      const A = atomos[i];
+      cadena.current = { desde: i, movido: false };
+      setPreview({ x1: A.x, y1: A.y, x2: A.x, y2: A.y });
+    }
   }
   function onPointerMove(e) {
-    if (arrastrando === null || modo !== "mover") return;
-    const [x, y] = coords(e);
-    setAtomos(atomos.map((a, j) => (j === arrastrando ? { ...a, x, y } : a)));
+    if (modo === "mover" && arrastrando !== null) {
+      const [x, y] = coords(e);
+      setAtomos(atomos.map((a, j) => (j === arrastrando ? { ...a, x, y } : a)));
+      return;
+    }
+    if (modo === "construir" && cadena.current) {
+      const [x, y] = coords(e);
+      const A = atomos[cadena.current.desde];
+      if (Math.hypot(x - A.x, y - A.y) > 8) cadena.current.movido = true;
+      setPreview({ x1: A.x, y1: A.y, x2: x, y2: y });
+    }
   }
-  const finArrastre = () => setArrastrando(null);
+  function onPointerUp(e) {
+    if (modo === "mover") { setArrastrando(null); return; }
+    const c = cadena.current;
+    cadena.current = null;
+    setPreview(null);
+    if (modo === "construir" && c && c.movido) {
+      const [x, y] = coords(e);
+      let destino = null;  // ¿soltó sobre otro átomo? → enlaza; si no, crea uno
+      atomos.forEach((a, j) => {
+        if (j !== c.desde && Math.hypot(a.x - x, a.y - y) <= R) destino = j;
+      });
+      suprimir.current = true;  // evita que el click suelto añada otro átomo
+      const mismo = (b, q) => (b.a === c.desde && b.b === q) || (b.a === q && b.b === c.desde);
+      if (destino !== null) {
+        if (!enlaces.some((b) => mismo(b, destino)))
+          setEnlaces([...enlaces, { a: c.desde, b: destino, orden }]);
+      } else {
+        const nuevo = atomos.length;
+        setAtomos([...atomos, { el, x, y }]);
+        setEnlaces([...enlaces, { a: c.desde, b: nuevo, orden }]);
+      }
+      setSel(null); setRes(null);
+    }
+  }
+  function finArrastre() { setArrastrando(null); cadena.current = null; setPreview(null); }
 
   function cargarPlantilla(clave) {
     const p = PLANTILLAS[clave];
@@ -256,7 +297,7 @@ export default function EditorVisual() {
         )}
       </div>
       <p className="hint">
-        {modo === "construir" && "Clic en el lienzo = átomo · clic en dos átomos = enlace"}
+        {modo === "construir" && "Clic = átomo · clic en dos átomos = enlace · arrastra desde un átomo = encadenar"}
         {modo === "mover" && "Arrastra los átomos para reacomodarlos"}
         {modo === "borrar" && "Clic en un átomo o un enlace para eliminarlo"}
       </p>
@@ -266,9 +307,13 @@ export default function EditorVisual() {
         viewBox={`0 0 ${W} ${H}`}
         onClick={clicLienzo}
         onPointerMove={onPointerMove}
-        onPointerUp={finArrastre}
+        onPointerUp={onPointerUp}
         onPointerLeave={finArrastre}
       >
+        {preview && (
+          <line x1={preview.x1} y1={preview.y1} x2={preview.x2} y2={preview.y2}
+                stroke="#6ee7b7" strokeWidth="2" strokeDasharray="5 4" pointerEvents="none" />
+        )}
         {enlaces.map((b, i) => {
           const A = atomos[b.a];
           const B = atomos[b.b];

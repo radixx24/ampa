@@ -5,6 +5,10 @@ const W = 560;
 const H = 380;
 const norm = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
+// Paleta para agrupar por época/corriente/rama.
+const PALETA = ["#60a5fa", "#6ee7b7", "#fbbf24", "#f87171", "#c084fc", "#fb923c",
+                "#34d399", "#f472b6", "#a3e635", "#22d3ee"];
+
 function construir(dicc) {
   const terms = Object.keys(dicc);
   const idx = {};
@@ -72,13 +76,19 @@ function paso(g) {
   }
 }
 
-function dibujar(ctx, g, sel) {
+function dibujar(ctx, g, vista) {
+  const { sel, filtro, colores } = vista;
+  const q = norm(filtro);
   ctx.fillStyle = "#0c1220";
   ctx.fillRect(0, 0, W, H);
   const { nodos, aristas } = g;
+  const coincide = (nd) => !q || norm(nd.t).includes(q);
+
   aristas.forEach(({ a, b }) => {
     const activo = sel && (nodos[a].t === sel || nodos[b].t === sel);
-    ctx.strokeStyle = activo ? "rgba(110,231,183,0.65)" : "rgba(122,130,154,0.22)";
+    const vis = coincide(nodos[a]) && coincide(nodos[b]);
+    ctx.strokeStyle = activo ? "rgba(110,231,183,0.65)"
+      : vis ? "rgba(122,130,154,0.22)" : "rgba(122,130,154,0.05)";
     ctx.lineWidth = activo ? 2 : 1;
     ctx.beginPath();
     ctx.moveTo(nodos[a].x, nodos[a].y);
@@ -88,37 +98,60 @@ function dibujar(ctx, g, sel) {
   nodos.forEach((nd) => {
     const r = 6 + Math.min(16, nd.n * 3);
     const activo = nd.t === sel;
-    ctx.fillStyle = activo ? "#6ee7b7" : "#60a5fa";
-    ctx.globalAlpha = activo ? 1 : 0.85;
+    const vis = coincide(nd);
+    ctx.fillStyle = activo ? "#6ee7b7" : (colores ? colores[nd.t] || "#7a829a" : "#60a5fa");
+    ctx.globalAlpha = !vis ? 0.12 : activo ? 1 : 0.85;
     ctx.beginPath();
     ctx.arc(nd.x, nd.y, r, 0, Math.PI * 2);
     ctx.fill();
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = vis ? 1 : 0.2;
     ctx.fillStyle = "#e6edf3";
     ctx.font = `${activo ? "700 " : ""}12px sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     ctx.fillText(nd.t, nd.x, nd.y + r + 2);
+    ctx.globalAlpha = 1;
   });
 }
 
 export default function GrafoFilosofia() {
   const canvasRef = useRef(null);
   const grafoRef = useRef({ nodos: [], aristas: [] });
-  const selRef = useRef(null);
+  const vistaRef = useRef({ sel: null, filtro: "", colores: null });
   const [dicc, setDicc] = useState(null);
+  const [clasif, setClasif] = useState(null);
   const [sel, setSel] = useState(null);
+  const [filtro, setFiltro] = useState("");
+  const [porGrupo, setPorGrupo] = useState(false);
 
   useEffect(() => { api.diccionario().then(setDicc).catch(() => {}); }, []);
-  useEffect(() => { if (dicc) grafoRef.current = construir(dicc); setSel(null); }, [dicc]);
-  useEffect(() => { selRef.current = sel; }, [sel]);
+  useEffect(() => {
+    if (!dicc) return;
+    grafoRef.current = construir(dicc);
+    setSel(null);
+    const terms = Object.keys(dicc);
+    if (terms.length) api.clasificar(terms).then(setClasif).catch(() => {});
+  }, [dicc]);
+
+  // Mapa término → color de grupo, y leyenda grupo → color.
+  const { colores, leyenda } = (() => {
+    if (!porGrupo || !clasif) return { colores: null, leyenda: [] };
+    const grupos = [...new Set(Object.values(clasif).map((c) => c.grupo))].sort();
+    const gc = {};
+    grupos.forEach((g, i) => (gc[g] = PALETA[i % PALETA.length]));
+    const colores = {};
+    Object.entries(clasif).forEach(([t, c]) => (colores[t] = gc[c.grupo]));
+    return { colores, leyenda: grupos.map((g) => [g, gc[g]]) };
+  })();
+
+  useEffect(() => { vistaRef.current = { sel, filtro, colores }; }, [sel, filtro, colores]);
 
   useEffect(() => {
     const ctx = canvasRef.current.getContext("2d");
     let raf;
     const frame = () => {
       paso(grafoRef.current);
-      dibujar(ctx, grafoRef.current, selRef.current);
+      dibujar(ctx, grafoRef.current, vistaRef.current);
       raf = requestAnimationFrame(frame);
     };
     frame();
@@ -147,10 +180,25 @@ export default function GrafoFilosofia() {
       ) : (
         <>
           <p className="hint">Nodo = término · línea = ideas que comparten términos · clic en un nodo.</p>
+          <div className="row grafo-ctrl">
+            <input className="buscador" placeholder="🔎 buscar término…"
+                   value={filtro} onChange={(e) => setFiltro(e.target.value)} />
+            <button className={"sec" + (porGrupo ? " on" : "")} onClick={() => setPorGrupo((v) => !v)}>
+              {porGrupo ? "● " : "○ "}Agrupar por época/corriente
+            </button>
+          </div>
+          {porGrupo && leyenda.length > 0 && (
+            <div className="leyenda-grupos">
+              {leyenda.map(([g, c]) => (
+                <span key={g} className="lg"><i style={{ background: c }} />{g}</span>
+              ))}
+            </div>
+          )}
           <canvas ref={canvasRef} width={W} height={H} className="grafo" onClick={clic} />
           {sel && dicc[sel] && (
             <div className="result">
-              <h4>{sel} ({dicc[sel].length})</h4>
+              <h4>{sel} ({dicc[sel].length}){clasif && clasif[sel] && clasif[sel].grupo !== "otro"
+                ? ` · ${clasif[sel].grupo}` : ""}</h4>
               <ul className="entradas">
                 {dicc[sel].map((p, i) => <li key={i}>{p.texto}</li>)}
               </ul>

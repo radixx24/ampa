@@ -120,6 +120,27 @@ def _diccionario(_: dict) -> dict:
     return {t: [p.to_dict() for p in ps] for t, ps in notebook.diccionario().items()}
 
 
+def _clasificar(datos: dict) -> dict:
+    """Clasifica términos por época/corriente/rama (para agrupar el grafo)."""
+    terminos = datos.get("terminos") or []
+    salida: Dict[str, dict] = {}
+    for termino in terminos:
+        res = identificar_filosofia(str(termino))
+        ent = res.entidades[0] if res.hay() else None
+        if ent is None:
+            salida[termino] = {"grupo": "otro", "tipo": "", "etiqueta": ""}
+        elif ent.tipo == "filósofo":
+            salida[termino] = {"grupo": ent.epoca or "filósofo", "tipo": "filósofo",
+                               "etiqueta": ent.categoria}
+        elif ent.tipo == "corriente":
+            salida[termino] = {"grupo": "corriente", "tipo": "corriente",
+                               "etiqueta": ent.nombre}
+        else:
+            salida[termino] = {"grupo": ent.categoria or "concepto", "tipo": "concepto",
+                               "etiqueta": ent.categoria}
+    return salida
+
+
 # (método, ruta) → función(datos) → cuerpo serializable
 _RUTAS: Dict[Tuple[str, str], Callable[[dict], object]] = {
     ("GET", "/api/salud"): lambda d: {"estado": "ok", "version": __version__},
@@ -142,6 +163,7 @@ _RUTAS: Dict[Tuple[str, str], Callable[[dict], object]] = {
     ).to_dict(),
     ("POST", "/api/filosofia/pensar"): _pensar,
     ("GET", "/api/filosofia/diccionario"): _diccionario,
+    ("POST", "/api/filosofia/clasificar"): _clasificar,
 }
 
 

@@ -56,12 +56,20 @@ export default function Visor3D({ molecula, temp = 298, onCerrar }) {
   };
   const up = () => { estado.current.drag = false; };
 
+  function exportarPNG() {
+    const a = document.createElement("a");
+    a.download = (molecula.nombre || "molecula") + "-3d.png";
+    a.href = canvasRef.current.toDataURL("image/png");
+    a.click();
+  }
+
   return (
     <div className="visor3d">
       <div className="visor-top">
         <b>🧊 Vista 3D — gira sola · arrastra para rotar</b>
         <span>
           <button className="sec" onClick={() => { estado.current.auto = !estado.current.auto; }}>⏯ Auto</button>
+          <button className="sec" onClick={exportarPNG}>🖼 PNG</button>
           <button className="sec" onClick={onCerrar}>Cerrar</button>
         </span>
       </div>

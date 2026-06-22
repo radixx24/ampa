@@ -41,6 +41,14 @@ class TestApi(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn("Kant", {f["nombre"] for f in cuerpo["filosofos"]})
 
+    def test_clasificar_filosofia(self):
+        status, cuerpo = manejar(
+            "POST", "/api/filosofia/clasificar", {"terminos": ["Nietzsche", "gato"]}
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(cuerpo["Nietzsche"]["tipo"], "filósofo")
+        self.assertEqual(cuerpo["gato"]["grupo"], "otro")
+
     def test_ruta_desconocida(self):
         status, _ = manejar("GET", "/api/no-existe")
         self.assertEqual(status, 404)
