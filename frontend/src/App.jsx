@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "./api.js";
+import Icon from "./Icon.jsx";
 import Quimica from "./Quimica.jsx";
 import Filosofia from "./Filosofia.jsx";
 
@@ -21,14 +22,14 @@ function Intro({ tab, onCerrar }) {
     <section className="intro">
       <div className="intro-top">
         <div>
-          <h2>{tab === "quimica" ? "Juega con la materia 🧪" : "Piensa en voz alta 📚"}</h2>
+          <h2>{tab === "quimica" ? "Juega con la materia" : "Piensa en voz alta"}</h2>
           <p>
             {tab === "quimica"
               ? "Construye moléculas, mira qué reacciones harían y descubre —con termodinámica de verdad— si algo puede existir. No necesitas saber química: explora y aprende sobre la marcha."
               : "Explora a los grandes pensadores, escribe tus propias ideas y velas conectarse en un grafo vivo. Aquí la filosofía se navega y se construye."}
           </p>
         </div>
-        <button className="cerrar-intro" onClick={onCerrar} title="Ocultar guía" aria-label="Ocultar">✕</button>
+        <button className="cerrar-intro" onClick={onCerrar} title="Ocultar guía" aria-label="Ocultar"><Icon name="x" size={15} /></button>
       </div>
       <div className="pasos">
         {PASOS[tab].map(([num, titulo, desc]) => (
@@ -65,10 +66,10 @@ export default function App() {
         <h1 className="marca"><span className="punto" /> AMPA</h1>
         <nav className="tabs">
           <button className={tab === "quimica" ? "activo" : ""} onClick={() => setTab("quimica")}>
-            🧪 Química
+            <Icon name="flask" size={16} /> Química
           </button>
           <button className={tab === "filosofia" ? "activo" : ""} onClick={() => setTab("filosofia")}>
-            📚 Filosofía
+            <Icon name="book" size={16} /> Filosofía
           </button>
         </nav>
         <span className={"estado " + (salud ? "ok" : salud === false ? "mal" : "")}>
@@ -90,6 +91,15 @@ export default function App() {
         AMPA · local y portable · sin dependencias en el núcleo ·{" "}
         <a href="https://github.com/radixx24/ampa" target="_blank" rel="noreferrer">código</a>
       </footer>
+
+      <nav className="bottom-nav">
+        <button className={tab === "quimica" ? "activo" : ""} onClick={() => setTab("quimica")}>
+          <Icon name="flask" size={20} /><span>Química</span>
+        </button>
+        <button className={tab === "filosofia" ? "activo" : ""} onClick={() => setTab("filosofia")}>
+          <Icon name="book" size={20} /><span>Filosofía</span>
+        </button>
+      </nav>
     </div>
   );
 }

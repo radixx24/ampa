@@ -45,11 +45,14 @@ sigue en el núcleo Python.
 
 | Archivo | Qué hace |
 |---|---|
-| `App.jsx` | Cabecera, pestañas, estado de la API y **guía rápida** (onboarding). |
+| `App.jsx` | Cabecera, pestañas, estado de la API, **guía rápida** y **barra inferior** (móvil). |
 | `api.js` | Cliente HTTP (`get`/`post`, base **mismo origen** en prod) y helper `slug`. |
+| `Icon.jsx` | Set de **iconos** minimalistas (SVG de línea, `currentColor`), sin emojis. |
+| `Toast.jsx` | **Notificaciones** (contexto `useToast`) que aparecen abajo y se van solas. |
 | `Explorar.jsx` | Catálogo navegable de filosofía (por época/rama) → siembra el cuaderno. |
-| `Quimica.jsx` | Tabla periódica + identificar + editor + proyección + compatibilidad. |
-| `EditorVisual.jsx` | Editor SVG de moléculas (modos, plantillas, PNG, **encadenar**, 3D/animación). |
+| `Quimica.jsx` | Tabla periódica + identificar + editor + **mis compuestos** + proyección + compatibilidad. |
+| `EditorVisual.jsx` | Editor SVG (modos, **atajos de teclado**, plantillas, **barra desplegable**, 3D/animación). |
+| `Compuestos.jsx` | Compuestos guardados como **plantillas**: cargar / analizar / proyectar. |
 | `Visor3D.jsx` | Visor 3D en `canvas` (rotación/proyección a mano + vibración térmica + PNG). |
 | `ReaccionAnimada.jsx` | Animación de reacciones (combustión / hidrogenación / neutralización). |
 | `Proyeccion.jsx` | **Umbral de Gibbs**: reactivos→productos + T → ecuación, ΔH/ΔS/ΔG, veredicto. |
@@ -138,11 +141,33 @@ sigue en el núcleo Python.
 - **Paleta monocroma** (negro, grises, un acento azul) con **bordes finos**, tipografía
   apretada y mucho aire; tokens en `:root` (`styles.css`). Botón primario blanco
   sobre negro, secundarios con borde.
+- **Iconos minimalistas** (`Icon.jsx`): SVG de línea que heredan el color del texto
+  (`currentColor`) y se animan suave al *hover*. **Cero emojis**.
 - **Responsivo**: rejillas que se apilan, topbar que envuelve, lienzos con
-  `aspect-ratio` (se adaptan a cualquier ancho) y *media queries* a 860/680 px.
+  `aspect-ratio` (se adaptan a cualquier ancho) y *media queries* a 860/680 px. En
+  móvil las pestañas se mueven a una **barra de navegación inferior** fija.
 - **Intuitivo**: una **guía rápida** (3 pasos por apartado, recordada en
   `localStorage`), **subtítulos** que explican cada tarjeta, leyenda de la tabla
   periódica y estados vacíos que invitan a actuar.
+
+### Mis compuestos como plantillas (`Compuestos`)
+- Lista lo que guardas (`GET /api/quimica/compuestos`). Cada compuesto es una
+  **plantilla** con tres acciones: **Cargar** (lo dibuja en el editor — un pequeño
+  *layout* 2D por fuerzas reconstruye las posiciones a partir de símbolos+enlaces),
+  **Analizar** (grupos y reacciones en sitio) y **Proyectar** (manda su fórmula a la
+  **proyección termodinámica** como reactivo). El estado se eleva en `Quimica.jsx`
+  (`editorSeed`, `proyeccionSeed`) y se hace *scroll* a la sección correspondiente.
+
+### Notificaciones (`Toast`)
+- Un proveedor de contexto expone `useToast()`. Al **guardar** un compuesto aparece
+  un *toast* abajo (verde si ok, rojo si falla) que se descarta solo. Sin librerías.
+
+### Atajos de teclado (editor) — auto-explicados
+- `C` construir · `M` mover · `B`/`Supr` borrar · `1/2/3` orden de enlace · `Esc`
+  deseleccionar (se ignoran si escribes en un campo). Los botones de modo muestran su
+  **tecla** (`<kbd>`) y una línea de **atajos** los lista: el propio sistema enseña qué hace.
+- Una **barra desplegable** («Más») agrupa las herramientas secundarias (animaciones,
+  PNG, limpiar) para no saturar; los botones se despliegan dinámicamente.
 
 ## 7. Errores esperados
 

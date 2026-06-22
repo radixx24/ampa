@@ -136,6 +136,17 @@ versionado según [SemVer](https://semver.org/lang/es/).
   origen** (cualquier puerto), no a un `127.0.0.1:8000` fijo.
 - **Arreglo**: el grafo ya no rompía la pestaña de Filosofía cuando el diccionario
   estaba vacío (se protege el `canvas` antes de dibujar).
+- **Compuestos como plantillas** (`Compuestos.jsx`): lo que guardas se puede
+  **cargar** al editor (con *layout* 2D reconstruido), **analizar** en sitio o
+  **proyectar** (ΔG) con un clic. Estado elevado en `Quimica.jsx`.
+- **Notificaciones** (`Toast.jsx`, contexto `useToast`): aviso al guardar (y al
+  fallar), abajo y autodescartable, sin librerías.
+- **Iconos minimalistas** (`Icon.jsx`): set de SVG de línea (`currentColor`) con
+  *hovers* suaves que **reemplazan todos los emojis** de la interfaz.
+- **Atajos de teclado** en el editor (`C`/`M`/`B`/`1`·`2`·`3`/`Esc`) **auto-explicados**
+  (teclas en `<kbd>` y línea de atajos) + **barra desplegable** «Más» para las
+  herramientas secundarias.
+- **Barra de navegación inferior** en móvil (las pestañas se mueven abajo).
 - **`ampa ampakadabra`** ✨: un solo comando que **conjura web + API** — compila el
   frontend si hace falta, lo sirve junto a la API desde el **mismo servidor** (un
   artefacto portable) y abre el navegador. La API sirve el build de React con

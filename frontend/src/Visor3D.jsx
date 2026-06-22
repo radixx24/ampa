@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { api } from "./api.js";
+import Icon from "./Icon.jsx";
 
 const COLOR = {
   H: "#dfe3ea", C: "#3a4150", O: "#e06c75", N: "#61afef",
@@ -66,11 +67,11 @@ export default function Visor3D({ molecula, temp = 298, onCerrar }) {
   return (
     <div className="visor3d">
       <div className="visor-top">
-        <b>🧊 Vista 3D — gira sola · arrastra para rotar</b>
+        <b><Icon name="cube" size={15} /> Vista 3D — gira sola · arrastra para rotar</b>
         <span>
-          <button className="sec" onClick={() => { estado.current.auto = !estado.current.auto; }}>⏯ Auto</button>
-          <button className="sec" onClick={exportarPNG}>🖼 PNG</button>
-          <button className="sec" onClick={onCerrar}>Cerrar</button>
+          <button className="sec" onClick={() => { estado.current.auto = !estado.current.auto; }} title="Pausar/reanudar giro"><Icon name="play" size={14} /> Auto</button>
+          <button className="sec" onClick={exportarPNG}><Icon name="image" size={14} /> PNG</button>
+          <button className="sec" onClick={onCerrar}><Icon name="x" size={14} /> Cerrar</button>
         </span>
       </div>
       <canvas

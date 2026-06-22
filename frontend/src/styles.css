@@ -145,6 +145,7 @@ textarea.mono { font-family: var(--mono); font-size: 12.5px; }
 
 /* ---------- Botones ---------- */
 button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   background: var(--fg-high); color: #000; border: 1px solid var(--fg-high);
   border-radius: var(--radio); padding: 9px 15px; font-weight: 500; cursor: pointer;
   font-size: 14px; font-family: inherit; letter-spacing: -0.01em;
@@ -338,6 +339,60 @@ button.sec.on { outline: 1px solid var(--fg-high); color: var(--fg-high); }
 .pie a { color: var(--muted); text-decoration: none; }
 .pie a:hover { color: var(--fg); }
 
+/* ---------- Iconos minimalistas ---------- */
+.icon { flex: none; vertical-align: -0.18em; transition: transform .15s ease, opacity .15s ease; }
+button .icon, .link .icon, .ej .icon, .exp-tag .icon, .badge .icon { vertical-align: middle; }
+button:hover .icon { transform: translateY(-0.5px); }
+h3 .icon { color: var(--muted); }
+
+/* ---------- Teclas (kbd) y atajos ---------- */
+kbd {
+  font-family: var(--mono); font-size: 10.5px; line-height: 1.4; color: var(--muted);
+  background: var(--bg-2); border: 1px solid var(--border-2); border-bottom-width: 2px;
+  border-radius: 5px; padding: 1px 5px; margin: 0 1px; min-width: 15px;
+  display: inline-block; text-align: center;
+}
+.atajos { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; color: var(--muted-2); }
+.modo-btn kbd { margin-left: 3px; }
+
+/* ---------- Barra de acciones del editor ---------- */
+.barra-acc button { padding: 8px 12px; }
+.tools-desplegable {
+  margin-top: 8px; padding: 10px; border: 1px dashed var(--border-2);
+  border-radius: var(--radio); background: var(--bg); animation: tool-in .18s ease;
+}
+@keyframes tool-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Notificaciones (toasts) ---------- */
+.toaster {
+  position: fixed; bottom: 22px; right: 22px; z-index: 200;
+  display: flex; flex-direction: column; gap: 8px; max-width: 360px;
+}
+.toast {
+  display: flex; align-items: center; gap: 10px; background: var(--bg-2);
+  border: 1px solid var(--border-2); border-radius: var(--radio); padding: 11px 14px;
+  font-size: 13.5px; color: var(--fg); box-shadow: var(--sombra); animation: toast-in .22s ease;
+}
+.toast .icon { flex: none; }
+.toast.ok .icon { color: var(--ok); }
+.toast.error .icon { color: var(--err); }
+.toast.info .icon { color: var(--accent-2); }
+@keyframes toast-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Mis compuestos (plantillas) ---------- */
+.comp-lista { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-direction: column; gap: 8px; }
+.comp { border: 1px solid var(--border); border-radius: var(--radio); padding: 11px 13px; background: var(--bg); }
+.comp-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.comp-id b { font-family: var(--mono); font-size: 16px; color: var(--fg-high); }
+.comp-id span { display: block; color: var(--muted); font-size: 12px; margin-top: 1px; }
+.comp-acc { display: flex; gap: 6px; flex-wrap: wrap; }
+.mini { padding: 6px 10px; font-size: 12.5px; }
+.comp-det { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.comp-det p { font-size: 13px; margin: 0 0 6px; }
+
+/* ---------- Barra de navegación inferior (móvil) ---------- */
+.bottom-nav { display: none; }
+
 /* ============================================================
    Responsivo
    ============================================================ */
@@ -359,4 +414,23 @@ button.sec.on { outline: 1px solid var(--fg-high); color: var(--fg-high); }
   .plantillas { margin: 8px 0 0; width: 100%; }
   .nombre { flex-basis: 100%; }
   .row button { flex: 1 1 auto; }
+  .comp-acc { width: 100%; }
+  .comp-acc .mini { flex: 1; }
+
+  /* La barra inferior reemplaza a las pestañas de arriba en móvil. */
+  .app { padding-bottom: 92px; }
+  .topbar .tabs { display: none; }
+  .bottom-nav {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+    background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+  .bottom-nav button {
+    flex: 1; flex-direction: column; gap: 3px; background: transparent; border: none;
+    color: var(--muted); font-size: 11px; padding: 6px 4px; border-radius: var(--radio);
+  }
+  .bottom-nav button:hover { background: transparent; }
+  .bottom-nav button.activo { color: var(--fg-high); }
+  .toaster { left: 14px; right: 14px; bottom: 100px; max-width: none; }
 }

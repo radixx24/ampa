@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { api, slug } from "./api.js";
+import Icon from "./Icon.jsx";
 import EditorVisual from "./EditorVisual.jsx";
+import Compuestos from "./Compuestos.jsx";
 import Proyeccion from "./Proyeccion.jsx";
 import Compatibilidad from "./Compatibilidad.jsx";
 
@@ -33,7 +35,7 @@ function TablaPeriodica() {
   return (
     <section className="card tabla-card">
       <h3>Tabla periódica</h3>
-      <p className="sub">Los 118 elementos. El color es su familia química. Toca uno para ver sus datos. {sel ? "" : "👇"}</p>
+      <p className="sub">Los 118 elementos. El color es su familia química. Toca uno para ver sus datos.</p>
       {error && <p className="err">{error}</p>}
       <div className="tabla">{principales.map(Tile)}</div>
       <div className="fbloque">{fblock.map(Tile)}</div>
@@ -78,7 +80,7 @@ function Identificar() {
 
   return (
     <section className="card">
-      <h3>🔍 Identificar química</h3>
+      <h3><Icon name="search" /> Identificar química</h3>
       <p className="sub">Escribe cualquier texto y AMPA detecta los elementos y compuestos (por nombre o fórmula).</p>
       <textarea rows={3} value={texto} onChange={(e) => setTexto(e.target.value)} />
       <button onClick={run}>Identificar</button>
@@ -112,13 +114,29 @@ function Identificar() {
 }
 
 export default function Quimica() {
+  const [editorSeed, setEditorSeed] = useState(null);
+  const [proyeccionSeed, setProyeccionSeed] = useState(null);
+  const [recargar, setRecargar] = useState(0);
+
+  function irA(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   return (
     <div className="apartado">
       <TablaPeriodica />
       <Identificar />
-      <EditorVisual />
+      <div id="editor">
+        <EditorVisual seed={editorSeed} onGuardado={() => setRecargar((x) => x + 1)} />
+      </div>
+      <Compuestos
+        recargar={recargar}
+        onCargar={(m) => { setEditorSeed({ ...m, n: Date.now() }); irA("editor"); }}
+        onProyectar={(f) => { setProyeccionSeed({ f, n: Date.now() }); irA("proyeccion"); }}
+      />
       <div className="columnas">
-        <Proyeccion />
+        <div id="proyeccion"><Proyeccion semilla={proyeccionSeed} /></div>
         <Compatibilidad />
       </div>
     </div>

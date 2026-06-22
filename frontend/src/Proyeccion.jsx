@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "./api.js";
+import Icon from "./Icon.jsx";
 
 // Ejemplos clásicos (el umbral de Gibbs en acción).
 const EJEMPLOS = [
@@ -13,17 +14,25 @@ const EJEMPLOS = [
 
 // Color del veredicto.
 const VERED = {
-  "espontánea": { c: "#0cce6b", txt: "✅ ESPONTÁNEA", sub: "puede ocurrir sola (ΔG < 0)" },
-  "no espontánea": { c: "#ff5c5c", txt: "❌ NO ESPONTÁNEA", sub: "la inversa es la favorable (ΔG > 0)" },
-  "en equilibrio": { c: "#f5a623", txt: "⚖️ EN EQUILIBRIO", sub: "ΔG ≈ 0" },
+  "espontánea": { c: "#0cce6b", icono: "check-circle", txt: "ESPONTÁNEA", sub: "puede ocurrir sola (ΔG < 0)" },
+  "no espontánea": { c: "#ff5c5c", icono: "x-circle", txt: "NO ESPONTÁNEA", sub: "la inversa es la favorable (ΔG > 0)" },
+  "en equilibrio": { c: "#f5a623", icono: "scale", txt: "EN EQUILIBRIO", sub: "ΔG ≈ 0" },
 };
 
-export default function Proyeccion() {
+export default function Proyeccion({ semilla }) {
   const [reactivos, setReactivos] = useState("Na, H2O");
   const [productos, setProductos] = useState("NaOH, H2");
   const [temp, setTemp] = useState(298);
   const [res, setRes] = useState(null);
   const [error, setError] = useState("");
+
+  // Un compuesto guardado puede sembrar aquí su fórmula como reactivo.
+  useEffect(() => {
+    if (semilla && semilla.f) {
+      setReactivos(semilla.f);
+      setRes(null);
+    }
+  }, [semilla]);
 
   async function proyectar() {
     try {
@@ -46,7 +55,7 @@ export default function Proyeccion() {
 
   return (
     <section className="card">
-      <h3>🔮 Proyección termodinámica · ¿puede existir?</h3>
+      <h3><Icon name="sparkles" /> Proyección termodinámica · ¿puede existir?</h3>
       <p className="hint">
         El <b>umbral</b> antes de tocar un tubo de ensayo: balanceo + Energía Libre
         de Gibbs (ΔG = ΔH − T·ΔS). Si ΔG &lt; 0, la reacción es espontánea.
@@ -83,7 +92,7 @@ export default function Proyeccion() {
 
       {res && !res.ok && (
         <div className="result">
-          <p className="alerta">⚠️ {res.razon}</p>
+          <p className="alerta"><Icon name="info" size={14} /> {res.razon}</p>
           {res.faltan && (
             <p className="hint">Sin datos termodinámicos para: {res.faltan.join(", ")}.</p>
           )}
@@ -94,7 +103,7 @@ export default function Proyeccion() {
         <div className="result proy">
           <p className="ecuacion">{res.ecuacion}</p>
           <div className="veredicto" style={{ borderColor: v.c, color: v.c }}>
-            <b>{v.txt}</b>
+            <b><Icon name={v.icono} size={18} /> {v.txt}</b>
             <span>{v.sub}</span>
           </div>
           <div className="termo-grid">
@@ -114,10 +123,10 @@ export default function Proyeccion() {
               <span className="tn">a {res.T} K</span>
             </div>
           </div>
-          <p className="motor">⚙️ {res.motor}.</p>
+          <p className="motor"><Icon name="sliders" size={14} /> {res.motor}.</p>
           {res.t_cruce && (
             <p className="hint">
-              🌡️ Temperatura de cruce (ΔG = 0): <b>{res.t_cruce} K</b>
+              <Icon name="thermometer" size={14} /> Temperatura de cruce (ΔG = 0): <b>{res.t_cruce} K</b>
               {" "}({Math.round(res.t_cruce - 273.15)} °C) — ahí cambia el veredicto.
             </p>
           )}

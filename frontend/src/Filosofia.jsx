@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "./api.js";
+import Icon from "./Icon.jsx";
 import Explorar from "./Explorar.jsx";
 import GrafoFilosofia from "./GrafoFilosofia.jsx";
 
@@ -29,7 +30,7 @@ function Identificar() {
 
   return (
     <section className="card">
-      <h3>🔍 Identificar</h3>
+      <h3><Icon name="search" /> Identificar</h3>
       <p className="sub">Pega cualquier texto y AMPA detecta a los filósofos, corrientes y conceptos que aparecen.</p>
       <textarea rows={3} value={texto} onChange={(e) => setTexto(e.target.value)} />
       <button onClick={run}>Identificar</button>
@@ -86,7 +87,7 @@ function Cuaderno({ semilla }) {
 
   return (
     <section className="card">
-      <h3>✍️ Tu cuaderno</h3>
+      <h3><Icon name="pen" /> Tu cuaderno</h3>
       <p className="sub">Escribe lo que piensas. AMPA lo guarda y arma tu diccionario personal con tus términos.</p>
       <textarea
         ref={areaRef}
@@ -110,7 +111,8 @@ function Cuaderno({ semilla }) {
           {terminos.map((t) => (
             <li key={t}>
               <button className="link" onClick={() => setAbierto(abierto === t ? null : t)}>
-                {abierto === t ? "▾ " : "▸ "}{t} <span className="cuenta">{dicc[t].length}</span>
+                <Icon name={abierto === t ? "chevron-down" : "chevron-right"} size={14} /> {t}
+                <span className="cuenta">{dicc[t].length}</span>
               </button>
               {abierto === t && (
                 <ul className="entradas">

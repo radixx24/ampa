@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "./api.js";
+import Icon from "./Icon.jsx";
 
 const PARES = [
   ["Na", "Cl"], ["Al", "O"], ["Ca", "O"], ["C", "O"], ["Fe", "Cu"], ["Ne", "F"],
@@ -38,7 +39,7 @@ export default function Compatibilidad() {
 
   return (
     <section className="card">
-      <h3>🧲 Compatibilidad entre elementos</h3>
+      <h3><Icon name="link" /> Compatibilidad entre elementos</h3>
       <p className="hint">
         ¿Se llevan? Tipo de enlace (por ΔEN), fórmula probable (aspa de cargas) y
         si su unión es favorable a esta temperatura (ΔG).
@@ -66,7 +67,7 @@ export default function Compatibilidad() {
       </div>
 
       {error && <p className="err">{error}</p>}
-      {res && !res.ok && <p className="alerta">⚠️ {res.razon}</p>}
+      {res && !res.ok && <p className="alerta"><Icon name="info" size={14} /> {res.razon}</p>}
 
       {res && res.ok && (
         <div className="result">

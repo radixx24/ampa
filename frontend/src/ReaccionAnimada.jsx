@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
+import Icon from "./Icon.jsx";
 
 const COLOR = {
   H: "#dfe3ea", C: "#3a4150", O: "#e06c75", N: "#61afef",
@@ -107,9 +108,9 @@ function construir(molecula, tipo) {
 }
 
 const TITULO = {
-  combustion: "🎬 Combustión — la materia se conserva",
-  hidrogenacion: "🎬 Hidrogenación — adición de H₂",
-  neutralizacion: "🎬 Neutralización — ácido + base",
+  combustion: "Combustión — la materia se conserva",
+  hidrogenacion: "Hidrogenación — adición de H₂",
+  neutralizacion: "Neutralización — ácido + base",
 };
 
 export default function ReaccionAnimada({ molecula, tipo, onCerrar }) {
@@ -134,8 +135,8 @@ export default function ReaccionAnimada({ molecula, tipo, onCerrar }) {
   return (
     <div className="visor3d">
       <div className="visor-top">
-        <b>{TITULO[tipo] || "🎬 Reacción"}</b>
-        <button className="sec" onClick={onCerrar}>Cerrar</button>
+        <b><Icon name="film" size={15} /> {TITULO[tipo] || "Reacción"}</b>
+        <button className="sec" onClick={onCerrar}><Icon name="x" size={14} /> Cerrar</button>
       </div>
       {datos ? (
         <>

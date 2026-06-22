@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "./api.js";
+import Icon from "./Icon.jsx";
 
 const TABS = [
   ["filosofos", "Filósofos"],
@@ -29,7 +30,7 @@ export default function Explorar({ onEscribir }) {
 
   return (
     <section className="card">
-      <h3>🧭 Explorar la filosofía</h3>
+      <h3><Icon name="compass" /> Explorar la filosofía</h3>
       <p className="sub">
         Navega la base de conocimiento sin escribir nada. Toca a cualquiera para
         escribir tu propia idea sobre él en el cuaderno de abajo.

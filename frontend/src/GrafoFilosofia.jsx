@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "./api.js";
+import Icon from "./Icon.jsx";
 
 const W = 560;
 const H = 380;
@@ -176,7 +177,7 @@ export default function GrafoFilosofia() {
 
   return (
     <section className="card">
-      <h3>🕸️ Grafo de conocimiento</h3>
+      <h3><Icon name="graph" /> Grafo de conocimiento</h3>
       {terms.length === 0 ? (
         <p className="vacio">Escribe pensamientos en el cuaderno y aquí verás cómo se conectan tus ideas.</p>
       ) : (

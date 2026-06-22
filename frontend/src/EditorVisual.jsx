@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "./api.js";
+import Icon from "./Icon.jsx";
+import { useToast } from "./Toast.jsx";
 import Visor3D from "./Visor3D.jsx";
 import ReaccionAnimada from "./ReaccionAnimada.jsx";
 
@@ -10,7 +12,11 @@ const COLOR = {
 };
 const colorDe = (el) => COLOR[el] || "#7a8290";
 const TEXTO_OSCURO = new Set(["H", "F", "S", "Cl"]);
-const MODOS = [["construir", "✏️ Construir"], ["mover", "✋ Mover"], ["borrar", "🗑 Borrar"]];
+const MODOS = [
+  ["construir", "Construir", "plus", "C"],
+  ["mover", "Mover", "move", "M"],
+  ["borrar", "Borrar", "trash", "B"],
+];
 const W = 560;
 const H = 320;
 const R = 16;
@@ -21,6 +27,49 @@ const POL_COLOR = {
   "n/d": "#555c66",
 };
 const SAT_COLOR = { saturado: "#6ee7b7", libre: "#e5c07b", sobreenlazado: "#f87171", "n/d": "#0e1116" };
+
+// Coloca en 2D una molécula que solo tiene símbolos + enlaces (compuesto guardado):
+// pequeño layout por fuerzas (repulsión + resortes) centrado en el lienzo.
+function disponer2D(simbolos, enlaces) {
+  const n = simbolos.length;
+  const cx = W / 2, cy = H / 2;
+  if (!n) return [];
+  const pos = simbolos.map((_, i) => ({
+    x: cx + Math.cos((2 * Math.PI * i) / n) * 70,
+    y: cy + Math.sin((2 * Math.PI * i) / n) * 70,
+  }));
+  for (let it = 0; it < 220; it++) {
+    const fx = new Array(n).fill(0), fy = new Array(n).fill(0);
+    for (let i = 0; i < n; i++)
+      for (let j = i + 1; j < n; j++) {
+        const dx = pos[i].x - pos[j].x, dy = pos[i].y - pos[j].y;
+        const d2 = dx * dx + dy * dy + 0.01, d = Math.sqrt(d2);
+        const f = 5200 / d2;
+        fx[i] += (dx / d) * f; fy[i] += (dy / d) * f;
+        fx[j] -= (dx / d) * f; fy[j] -= (dy / d) * f;
+      }
+    enlaces.forEach(([a, b]) => {
+      const dx = pos[b].x - pos[a].x, dy = pos[b].y - pos[a].y;
+      const d = Math.hypot(dx, dy) + 0.01;
+      const f = (d - 64) * 0.18;
+      fx[a] += (dx / d) * f; fy[a] += (dy / d) * f;
+      fx[b] -= (dx / d) * f; fy[b] -= (dy / d) * f;
+    });
+    for (let i = 0; i < n; i++) {
+      pos[i].x += Math.max(-12, Math.min(12, fx[i]));
+      pos[i].y += Math.max(-12, Math.min(12, fy[i]));
+    }
+  }
+  const xs = pos.map((p) => p.x), ys = pos.map((p) => p.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const s = Math.min(1, (W - 80) / Math.max(1, maxX - minX), (H - 80) / Math.max(1, maxY - minY));
+  return simbolos.map((el, i) => ({
+    el,
+    x: cx + (pos[i].x - (minX + maxX) / 2) * s,
+    y: cy + (pos[i].y - (minY + maxY) / 2) * s,
+  }));
+}
 
 function benceno() {
   const cx = 280, cy = 160, Rc = 52, Rh = 92;
@@ -85,8 +134,9 @@ const PLANTILLAS = {
   benceno: benceno(),
 };
 
-export default function EditorVisual() {
+export default function EditorVisual({ seed, onGuardado }) {
   const svgRef = useRef(null);
+  const notificar = useToast();
   const [el, setEl] = useState("C");
   const [orden, setOrden] = useState(1);
   const [modo, setModo] = useState("construir");
@@ -100,13 +150,37 @@ export default function EditorVisual() {
   const [nombre, setNombre] = useState("");
   const [res, setRes] = useState(null);
   const [error, setError] = useState("");
-  const [guardados, setGuardados] = useState([]);
   const [mol3d, setMol3d] = useState(null);
   const [animMol, setAnimMol] = useState(null);
   const [temp, setTemp] = useState(298);
+  const [masTools, setMasTools] = useState(false);
 
-  const cargar = () => api.listarCompuestos().then(setGuardados).catch(() => {});
-  useEffect(() => { cargar(); }, []);
+  // Cargar un compuesto guardado (solo símbolos + enlaces) como plantilla.
+  useEffect(() => {
+    if (!seed || !seed.atomos) return;
+    setAtomos(disponer2D(seed.atomos, seed.enlaces || []));
+    setEnlaces((seed.enlaces || []).map(([a, b, o]) => ({ a, b, orden: o })));
+    setNombre(seed.nombre || "");
+    setSel(null); setRes(null);
+  }, [seed]);
+
+  // Atajos de teclado (ignora cuando escribes en un campo).
+  useEffect(() => {
+    function onKey(e) {
+      const t = e.target.tagName;
+      if (t === "INPUT" || t === "TEXTAREA" || t === "SELECT") return;
+      const k = e.key;
+      if (k === "c" || k === "C") { setModo("construir"); setSel(null); }
+      else if (k === "m" || k === "M") { setModo("mover"); setSel(null); }
+      else if (k === "b" || k === "B" || k === "Delete" || k === "Backspace") { setModo("borrar"); setSel(null); }
+      else if (k === "1") setOrden(1);
+      else if (k === "2") setOrden(2);
+      else if (k === "3") setOrden(3);
+      else if (k === "Escape") setSel(null);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   function coords(e) {
     const r = svgRef.current.getBoundingClientRect();
@@ -213,8 +287,15 @@ export default function EditorVisual() {
     catch (e) { setError("" + e); }
   }
   async function guardar() {
-    try { setError(""); await api.guardarCompuesto(molecula()); cargar(); }
-    catch (e) { setError("" + e); }
+    try {
+      setError("");
+      const r = await api.guardarCompuesto(molecula());
+      notificar(`Guardado: ${r.formula}${r.nombre ? " · " + r.nombre : ""}`, "ok");
+      if (onGuardado) onGuardado();
+    } catch (e) {
+      setError("" + e);
+      notificar("No se pudo guardar el compuesto", "error");
+    }
   }
   function limpiar() { setAtomos([]); setEnlaces([]); setSel(null); setRes(null); setError(""); }
 
@@ -249,17 +330,18 @@ export default function EditorVisual() {
 
   return (
     <section className="card">
-      <h3>⚛️ Editor de moléculas</h3>
+      <h3><Icon name="atom" /> Editor de moléculas</h3>
       <p className="sub">Dibuja tu molécula: clic en el lienzo crea un átomo, y al unir dos átomos los enlazas. Luego analízala, mírala en 3D o anímala. ¿Apenas empiezas? Usa una plantilla.</p>
       <div className="paleta">
         <span>Modo:</span>
-        {MODOS.map(([m, etiqueta]) => (
-          <button key={m} className={"pchip " + (modo === m ? "on" : "")} onClick={() => { setModo(m); setSel(null); }}>
-            {etiqueta}
+        {MODOS.map(([m, etiqueta, icono, tecla]) => (
+          <button key={m} className={"pchip modo-btn " + (modo === m ? "on" : "")}
+                  onClick={() => { setModo(m); setSel(null); }} title={`${etiqueta} · atajo: ${tecla}`}>
+            <Icon name={icono} size={15} /> {etiqueta} <kbd>{tecla}</kbd>
           </button>
         ))}
         <select className="plantillas" defaultValue="" onChange={(e) => { cargarPlantilla(e.target.value); e.target.value = ""; }}>
-          <option value="" disabled>＋ Plantilla…</option>
+          <option value="" disabled>Plantilla…</option>
           {Object.keys(PLANTILLAS).map((k) => <option key={k} value={k}>{k}</option>)}
         </select>
       </div>
@@ -293,7 +375,7 @@ export default function EditorVisual() {
             <i className="lp" style={{ background: POL_COLOR["covalente no polar"] }} /> no polar
             <i className="lp" style={{ background: POL_COLOR["covalente polar"] }} /> polar
             <i className="lp" style={{ background: POL_COLOR["iónico"] }} /> iónico
-            {!analisis.estable && <b className="alerta">⚠ valencias</b>}
+            {!analisis.estable && <b className="alerta"><Icon name="info" size={13} /> valencias</b>}
           </span>
         )}
       </div>
@@ -301,6 +383,11 @@ export default function EditorVisual() {
         {modo === "construir" && "Clic = átomo · clic en dos átomos = enlace · arrastra desde un átomo = encadenar"}
         {modo === "mover" && "Arrastra los átomos para reacomodarlos"}
         {modo === "borrar" && "Clic en un átomo o un enlace para eliminarlo"}
+      </p>
+      <p className="hint atajos">
+        <Icon name="keyboard" size={14} /> Atajos:
+        <kbd>C</kbd> crear <kbd>M</kbd> mover <kbd>B</kbd> borrar ·
+        <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> enlace · <kbd>Esc</kbd> soltar
       </p>
       <svg
         ref={svgRef}
@@ -351,19 +438,24 @@ export default function EditorVisual() {
           </g>
         ))}
       </svg>
-      <div className="row">
+      <div className="row barra-acc">
         <input className="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="nombre (opcional)" />
-        <button onClick={analizar} disabled={!atomos.length}>Analizar</button>
-        <button className="sec" onClick={() => setMol3d(molecula())} disabled={!atomos.length}>🧊 Ver en 3D</button>
-        <button className="sec" onClick={() => setAnimMol({ mol: molecula(), tipo: "combustion" })} disabled={!combustible} title={combustible ? "" : "Necesita C y H"}>🎬 Combustión</button>
-        <button className="sec" onClick={() => setAnimMol({ mol: molecula(), tipo: "hidrogenacion" })} disabled={!tieneDobleCC} title={tieneDobleCC ? "" : "Necesita un C=C"}>🎬 Hidrogenación</button>
-        <button className="sec" onClick={() => setAnimMol({ mol: molecula(), tipo: "neutralizacion" })} disabled={!esAcido} title={esAcido ? "" : "Analiza un ácido carboxílico primero"}>🎬 Neutralización</button>
+        <button onClick={analizar} disabled={!atomos.length}><Icon name="search" size={16} /> Analizar</button>
+        <button className="sec" onClick={() => setMol3d(molecula())} disabled={!atomos.length}><Icon name="cube" size={16} /> 3D</button>
+        <button className="sec" onClick={guardar} disabled={!atomos.length}><Icon name="save" size={16} /> Guardar</button>
+        <button className="sec" onClick={() => setMasTools((v) => !v)} disabled={!atomos.length} title="Más herramientas">
+          <Icon name="sliders" size={16} /> Más <Icon name={masTools ? "chevron-down" : "chevron-right"} size={14} />
+        </button>
       </div>
-      <div className="row">
-        <button className="sec" onClick={guardar} disabled={!atomos.length}>Guardar</button>
-        <button className="sec" onClick={exportarPNG} disabled={!atomos.length}>🖼 PNG</button>
-        <button className="sec" onClick={limpiar}>Limpiar</button>
-      </div>
+      {masTools && (
+        <div className="row tools-desplegable">
+          <button className="sec" onClick={() => setAnimMol({ mol: molecula(), tipo: "combustion" })} disabled={!combustible} title={combustible ? "Animar combustión" : "Necesita C y H"}><Icon name="film" size={15} /> Combustión</button>
+          <button className="sec" onClick={() => setAnimMol({ mol: molecula(), tipo: "hidrogenacion" })} disabled={!tieneDobleCC} title={tieneDobleCC ? "Animar hidrogenación" : "Necesita un C=C"}><Icon name="film" size={15} /> Hidrogenación</button>
+          <button className="sec" onClick={() => setAnimMol({ mol: molecula(), tipo: "neutralizacion" })} disabled={!esAcido} title={esAcido ? "Animar neutralización" : "Analiza un ácido carboxílico primero"}><Icon name="film" size={15} /> Neutralización</button>
+          <button className="sec" onClick={exportarPNG} disabled={!atomos.length}><Icon name="image" size={15} /> PNG</button>
+          <button className="sec" onClick={limpiar}><Icon name="trash" size={15} /> Limpiar</button>
+        </div>
+      )}
       {error && <p className="err">{error}</p>}
       {mol3d && <Visor3D molecula={mol3d} temp={temp} onCerrar={() => setMol3d(null)} />}
       {animMol && <ReaccionAnimada molecula={animMol.mol} tipo={animMol.tipo} onCerrar={() => setAnimMol(null)} />}
@@ -383,16 +475,6 @@ export default function EditorVisual() {
               ))}
             </ul>
           )}
-        </div>
-      )}
-      {guardados.length > 0 && (
-        <div className="guardados">
-          <h4>Tus compuestos ({guardados.length})</h4>
-          <ul>
-            {guardados.map((m, i) => (
-              <li key={i}>{m.nombre || "(sin nombre)"} — <b>{m.formula}</b> · {m.masa_molar} g/mol</li>
-            ))}
-          </ul>
         </div>
       )}
     </section>

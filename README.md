@@ -199,18 +199,23 @@ Dos **apartados**:
     **encadenar** (arrastrar desde un átomo crea átomo + enlace de un gesto).
   - **Química viva**: enlaces coloreados por **polaridad**, átomos por **saturación
     de valencia**, e input de **temperatura**.
-  - **🧊 Ver en 3D** — visor **hecho desde cero** (sin librerías 3D); enlaces
+  - **Ver en 3D** — visor **hecho desde cero** (sin librerías 3D); enlaces
     dobles/triples, tamaño por **radio**, **vibración térmica** y exportar PNG.
-  - **🎬 Reacciones** — combustión (átomo a átomo), hidrogenación y neutralización.
-  - **🔮 Proyección termodinámica** — reactivos→productos + temperatura → **ΔG** y
-    veredicto de si **puede existir**; y **🧲 compatibilidad** entre dos elementos.
+  - **Reacciones** — combustión (átomo a átomo), hidrogenación y neutralización.
+  - **Proyección termodinámica** — reactivos→productos + temperatura → **ΔG** y
+    veredicto de si **puede existir**; y **compatibilidad** entre dos elementos.
+  - **Mis compuestos** — lo que guardas queda como **plantilla**: lo **cargas**,
+    **analizas** o **proyectas** (ΔG) con un clic; al guardar sale una **notificación**.
+  - **Atajos de teclado** (`C` crear · `M` mover · `B` borrar · `1/2/3` enlace · `Esc`)
+    que el propio editor muestra, y una **barra desplegable** con las herramientas extra.
 - **Filosofía**: **explorar** la base (filósofos por época, corrientes, conceptos) →
   **escribir** en tu cuaderno/diccionario → **ver** tus ideas conectadas en un
   **grafo** (estilo Obsidian) con buscador y agrupado por época/corriente.
 
-Diseño con **estética Vercel** (monocromo, bordes finos), **responsivo** (móvil y
-escritorio) y una **guía rápida** para empezar sin saber nada. El cliente usa el
-**mismo origen** que sirve la web, así que funciona en cualquier puerto.
+Diseño con **estética Vercel** (monocromo, bordes finos), **iconos minimalistas**
+(sin emojis) con *hovers* suaves, **responsivo** (con **barra inferior** en móvil) y
+una **guía rápida** para empezar sin saber nada. El cliente usa el **mismo origen**
+que sirve la web, así que funciona en cualquier puerto.
 
 Detalle técnico en [docs/modulos/frontend.md](docs/modulos/frontend.md).
 
