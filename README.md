@@ -128,10 +128,11 @@ el **frontend** consume la API. Por eso todo se puede empaquetar en **un binario
 | `answer` | **Responde con fuentes**: percibe + recupera + **confianza/origen** + química/filosofía. | Q&A honesto sobre tus apuntes. | [respuesta.md](docs/modulos/respuesta.md) |
 | `cycle` | Orquesta **percibir → recordar → actuar** en un comando. | La tesis del proyecto, hecha demo. | [ciclo.md](docs/modulos/ciclo.md) |
 | `chemistry` | Tabla (118), fórmulas, reconocedor, **moléculas**, **grupos**, **reacciones**, **geometría 3D**. | El editor de enlaces de carbono. | [quimica.md](docs/modulos/quimica.md) |
+| `chemistry` (termo) | **Balanceo general**, **Gibbs (ΔG)** como umbral y **compatibilidad** entre elementos. | Proyectar si algo puede existir/reaccionar. | [termodinamica.md](docs/modulos/termodinamica.md) |
 | `philosophy` | Reconocedor (filósofos/corrientes/conceptos) y **cuaderno/diccionario personal**. | Pensar y construir tu propio glosario. | [filosofia.md](docs/modulos/filosofia.md) |
 | `api` | **API JSON** portable (stdlib) + sirve el frontend compilado. | Que la web (u otra cosa) hable con AMPA. | [api.md](docs/modulos/api.md) |
 | `cli` | Interfaz de línea de comandos (`argparse`). | Manejar todo desde la terminal. | — |
-| *frontend* | App React: apartados, editor visual, **visor 3D**, **animación**. | *Ver* las sustancias que proyectas. | [frontend.md](docs/modulos/frontend.md) |
+| *frontend* | App React: apartados, editor visual, **visor 3D**, **animación**, **proyección termodinámica**, **grafo**. | *Ver* las sustancias que proyectas. | [frontend.md](docs/modulos/frontend.md) |
 
 ---
 
@@ -173,10 +174,14 @@ Stdlib pura, con CORS. Despacho probado sin sockets (`manejar`).
 | `POST /api/quimica/analizar` `{molécula}` | Fórmula, masa, **grupos**, **reacciones**, **valencia/polaridad**. |
 | `POST /api/quimica/reacciones` `{molécula}` | Reacciones plausibles. |
 | `POST /api/quimica/geometria` `{molécula}` | Coordenadas **3D** por átomo (con radio). |
+| `POST /api/quimica/balancear` `{reactivos, productos}` | **Balancea** la ecuación → coeficientes. |
+| `POST /api/quimica/proyectar` `{reactivos, productos, temperatura}` | **ΔH/ΔS/ΔG** + veredicto de espontaneidad. |
+| `POST /api/quimica/compatibilidad` `{a, b, temperatura}` | Enlace, **fórmula** y **ΔG** de formación. |
 | `GET/POST /api/quimica/compuestos` | Listar / **guardar** compuestos. |
 | `POST /api/filosofia/identificar` `{texto}` | Filósofos, corrientes, conceptos. |
 | `POST /api/filosofia/pensar` `{texto, terminos}` | Guarda un pensamiento. |
 | `GET  /api/filosofia/diccionario` | Diccionario personal. |
+| `POST /api/filosofia/clasificar` `{terminos}` | Clasifica términos (época/corriente) para el grafo. |
 | `GET  /*` | El frontend compilado (SPA). |
 
 Molécula = `{ "nombre", "atomos": ["C","H",…], "enlaces": [[a,b,orden],…] }`.
@@ -189,14 +194,17 @@ Dos **apartados**:
 
 - **Química**: tabla periódica interactiva (color por categoría, posición por
   grupo/periodo), **identificar** texto, y el **editor de enlaces de carbono**:
-  - Modos **construir / mover / borrar**, plantillas, **exportar PNG**.
+  - Modos **construir / mover / borrar**, plantillas, **exportar PNG**, y
+    **encadenar** (arrastrar desde un átomo crea átomo + enlace de un gesto).
   - **Química viva**: enlaces coloreados por **polaridad**, átomos por **saturación
     de valencia**, e input de **temperatura**.
   - **🧊 Ver en 3D** — visor **hecho desde cero** (sin librerías 3D); enlaces
-    dobles/triples, tamaño por **radio** y **vibración térmica** con la temperatura.
+    dobles/triples, tamaño por **radio**, **vibración térmica** y exportar PNG.
   - **🎬 Reacciones** — combustión (átomo a átomo), hidrogenación y neutralización.
+  - **🔮 Proyección termodinámica** — reactivos→productos + temperatura → **ΔG** y
+    veredicto de si **puede existir**; y **🧲 compatibilidad** entre dos elementos.
 - **Filosofía**: identificar texto, el **cuaderno/diccionario** y un **grafo de
-  conocimiento** (estilo Obsidian) que conecta tus ideas.
+  conocimiento** (estilo Obsidian) con **buscador** y **agrupado por época/corriente**.
 
 Detalle técnico en [docs/modulos/frontend.md](docs/modulos/frontend.md).
 
@@ -217,6 +225,13 @@ Detalle técnico en [docs/modulos/frontend.md](docs/modulos/frontend.md).
   por patrones sobre el grafo de enlaces; **combustión balanceada** con fracciones
   exactas; **geometría 3D** por un layout de fuerzas (repulsión + resortes con
   longitud ≈ suma de **radios covalentes**).
+- **Termodinámica (el umbral)** — **balancea cualquier ecuación** resolviendo el
+  **espacio nulo** de la matriz de conteos atómicos (con `Fraction`, exacto), y
+  calcula la **Energía Libre de Gibbs** `ΔG = ΔH − T·ΔS` a partir de datos estándar
+  de formación (ΔHf°, S°). Si **ΔG < 0**, es espontánea. Da la **temperatura de
+  cruce** (donde cambia el signo) y, para dos elementos, predice el enlace (ΔEN), la
+  **fórmula por aspa de cargas** y el ΔG de su formación. *El número manda; si falta
+  un dato, lo dice (no inventa).*
 - **Filosofía** — reconocimiento por **palabra completa** (sin acentos); el cuaderno
   agrupa pensamientos por término (los pones tú o los detecta).
 - **Visor 3D** — rota los puntos con matrices a mano, proyecta con perspectiva,
@@ -242,6 +257,10 @@ Para que no te agarren en curva, esto es lo que AMPA **no** hace o hace con mati
   - La **geometría 3D** es un *layout* para visualizar: respeta longitudes ≈ radios
     covalentes y la conectividad, pero **no** modela ángulos ni estereoquímica.
   - Los **radios covalentes** son los de Cordero et al. (aproximados en superpesados).
+  - La **termodinámica (ΔG)** usa datos estándar (298 K) **independientes de T**
+    (aproximación de Ellingham): el **signo** y la **temperatura de cruce** orientan
+    bien, pero no es DFT. Es **termodinámica, no cinética** (dice si *puede*, no si es
+    *rápida*) y solo cubre las especies con datos en la tabla (ampliable).
 - **Los datasets de filosofía son mínimos** (ampliables): cubren lo común.
 - **La API y el CORS están pensados para uso local** (127.0.0.1); endurécelos antes
   de exponerlos en red.
@@ -255,7 +274,7 @@ Para que no te agarren en curva, esto es lo que AMPA **no** hace o hace con mati
 ## 11. Pruebas
 
 ```bash
-python -m unittest discover -s tests -t .     # 111 pruebas, sin dependencias
+python -m unittest discover -s tests -t .     # 143 pruebas, sin dependencias
 ```
 
 Cada módulo tiene su archivo (`tests/test_*.py`). El frontend se valida con
@@ -280,6 +299,6 @@ docs/            concepto-maestro, visión, arquitectura, roadmap, glosario,
 
 📚 Más: [Concepto Maestro](docs/concepto-maestro.md) ·
 [Arquitectura](docs/01-arquitectura.md) ·
-[Decisiones (ADR 0001–0015)](docs/02-decisiones/README.md) ·
+[Decisiones (ADR 0001–0016)](docs/02-decisiones/README.md) ·
 [Roadmap](docs/03-roadmap.md) · [Glosario](docs/04-glosario.md) ·
 [CHANGELOG](CHANGELOG.md)

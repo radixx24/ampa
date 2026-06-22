@@ -47,11 +47,13 @@ sigue en el núcleo Python.
 |---|---|
 | `App.jsx` | Cabecera, pestañas (Química/Filosofía), estado de salud de la API. |
 | `api.js` | Cliente HTTP (`get`/`post`) y helper `slug`. |
-| `Quimica.jsx` | Tabla periódica + identificar + monta el editor. |
-| `EditorVisual.jsx` | Editor SVG de moléculas (modos, plantillas, PNG, botones 3D/animación). |
-| `Visor3D.jsx` | Visor 3D en `canvas` (rotación/proyección a mano + vibración térmica). |
+| `Quimica.jsx` | Tabla periódica + identificar + editor + proyección + compatibilidad. |
+| `EditorVisual.jsx` | Editor SVG de moléculas (modos, plantillas, PNG, **encadenar**, 3D/animación). |
+| `Visor3D.jsx` | Visor 3D en `canvas` (rotación/proyección a mano + vibración térmica + PNG). |
 | `ReaccionAnimada.jsx` | Animación de reacciones (combustión / hidrogenación / neutralización). |
-| `GrafoFilosofia.jsx` | Grafo de conocimiento (física en vivo) del diccionario. |
+| `Proyeccion.jsx` | **Umbral de Gibbs**: reactivos→productos + T → ecuación, ΔH/ΔS/ΔG, veredicto. |
+| `Compatibilidad.jsx` | Dos elementos + T → tipo de enlace, fórmula y ΔG de formación. |
+| `GrafoFilosofia.jsx` | Grafo de conocimiento (física en vivo) con buscador y agrupado por época. |
 | `Filosofia.jsx` | Identificar + cuaderno/diccionario + grafo. |
 | `styles.css` | Tema oscuro, sin librerías de estilo. |
 
@@ -95,6 +97,23 @@ sigue en el núcleo Python.
   **saturación de valencia** (libre / saturado / sobreenlazado, con alerta global).
 - La **temperatura** (K) se pasa al visor 3D, que añade una **vibración** a los
   átomos proporcional a `T` (a más calor, más agitación). Es visual y orientativo.
+- **Encadenar**: en modo construir, **arrastrar desde un átomo** hacia el vacío
+  crea un átomo nuevo + su enlace en un solo gesto (línea guía punteada); si sueltas
+  sobre otro átomo, los enlaza. Hace que construir cadenas de carbono fluya.
+
+### Proyección termodinámica (`Proyeccion`) — el umbral
+- Escribes **reactivos → productos** (fórmulas) y mueves el slider de **temperatura**.
+- Llama a `POST /api/quimica/proyectar`: la API **balancea** y calcula **ΔG**.
+- Pinta la **ecuación balanceada**, un **veredicto** con color (✅ espontánea / ❌ no
+  / ⚖️ equilibrio), las tres magnitudes **ΔH/ΔS/ΔG** (coloreadas por signo), el
+  **motor** (entálpico/entrópico) y la **temperatura de cruce**. Trae ejemplos
+  clásicos (sodio+agua, óxido hidratado, caliza, amoniaco…). Toda la química vive en
+  el núcleo; el front solo dibuja el resultado.
+
+### Compatibilidad (`Compatibilidad`)
+- Dos elementos + temperatura → `POST /api/quimica/compatibilidad`: muestra el
+  **tipo de enlace**, la **fórmula probable** (aspa de cargas), la **reactividad** y,
+  si hay datos, el **ΔG de formación**. Dos «bolas» con su símbolo y el producto.
 
 ### Grafo de conocimiento (`GrafoFilosofia`) — estilo Obsidian
 - Construye un grafo: **nodos** = términos del diccionario (tamaño por nº de
@@ -102,6 +121,10 @@ sigue en el núcleo Python.
 - Lo acomoda con un **layout de fuerzas en vivo** (repulsión + resortes + gravedad
   al centro); al **clic** en un nodo resalta sus conexiones y lista los pensamientos
   de ese término. Así organizas y *ves* tus ideas conectadas.
+- **Buscador**: filtra/resalta los nodos cuyo término coincide (atenúa el resto).
+- **Agrupar por época/corriente**: pide `POST /api/filosofia/clasificar` y **colorea**
+  los nodos por su grupo (época del filósofo / corriente / rama del concepto), con
+  una **leyenda**. Los términos no reconocidos quedan en «otro».
 
 ## 7. Errores esperados
 

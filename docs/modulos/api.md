@@ -30,9 +30,12 @@ frontend (p. ej. React), **sin dependencias** (`http.server`).
 - `GET  /api/quimica/tabla` · `POST /api/quimica/identificar`
 - `POST /api/quimica/analizar` (molécula → fórmula, masa, grupos, reacciones)
 - `POST /api/quimica/reacciones` · `POST /api/quimica/geometria` (coordenadas 3D)
+- `POST /api/quimica/balancear` (ecuación general → coeficientes)
+- `POST /api/quimica/proyectar` (reactivos→productos, T → ΔH/ΔS/ΔG, veredicto)
+- `POST /api/quimica/compatibilidad` (a, b, T → enlace, fórmula, ΔG)
 - `GET/POST /api/quimica/compuestos` (listar / guardar)
 - `POST /api/filosofia/identificar` · `POST /api/filosofia/pensar`
-- `GET  /api/filosofia/diccionario`
+- `GET  /api/filosofia/diccionario` · `POST /api/filosofia/clasificar`
 - `GET  /*` → frontend compilado (SPA), si existe `frontend/dist`.
 
 Arranque: `ampa servir` (solo API/estáticos) o `ampa ampakadabra` ✨ (compila el
@@ -61,8 +64,9 @@ frontend si falta, sirve web + API y abre el navegador).
 
 ## 9. Pruebas mínimas
 
-- `tests/test_api.py` (7 casos): salud, tabla, identificar, analizar, filosofía,
-  404 y 400 — sobre `manejar` (sin sockets).
+- `tests/test_api.py` (15 casos): salud, tabla, identificar, analizar, reacciones,
+  geometría, **balancear**, **proyectar**, **compatibilidad**, **clasificar**,
+  filosofía, estáticos, 404 y 400 — sobre `manejar` (sin sockets).
 - Ejecutar: `python -m unittest discover -s tests -t .`
 
 ## 10. Cambios pendientes

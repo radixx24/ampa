@@ -24,11 +24,15 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
 - Genera **geometría 3D** (layout por fuerzas) para visualizar la molécula.
 - Analiza **enlaces**: **saturación de valencia** por átomo y **polaridad** por
   electronegatividad (covalente no polar / polar / iónico).
+- **Termodinámica** (módulo aparte, ver [`termodinamica.md`](termodinamica.md)):
+  **balancea** cualquier ecuación, calcula la **Energía Libre de Gibbs** como
+  umbral de espontaneidad y evalúa la **compatibilidad** entre elementos.
 - Devuelve entidades estructuradas y serializables (`to_dict`, JSON).
 
 **No hace:**
-- No balancea reacciones ni calcula masas (aún): solo identifica y compone.
 - No usa ML/NER ni dependencias externas (reglas + datos, como ADR 0008/0007).
+- No simula orbitales (DFT) ni cinética: la termodinámica es el **umbral**
+  (favorable o no), no la velocidad. Ver `termodinamica.md` §8.
 
 ## 3. Entradas
 
@@ -95,5 +99,6 @@ para el dominio químico (Fase 6) y para capas **visuales/adaptativas**.
 ## 10. Cambios pendientes
 
 - Ampliar aún más el diccionario de compuestos y los sinónimos.
-- Más tipos de reacción y balanceo general (no solo combustión).
-- Compatibilidad por temperatura/cargas iónicas más allá de lo orientativo.
+- ~~Balanceo general (no solo combustión)~~ → hecho (`balance.py`).
+- ~~Compatibilidad por temperatura/cargas iónicas~~ → hecho (`compatibility.py` +
+  Gibbs, ver `termodinamica.md`). Falta ampliar la tabla termodinámica.

@@ -107,6 +107,23 @@ versionado según [SemVer](https://semver.org/lang/es/).
   **neutralización**.
 - **🕸️ Grafo de conocimiento (estilo Obsidian)** en Filosofía: términos como nodos,
   co-ocurrencia como aristas, con layout de fuerzas en vivo e interacción.
+- **🔮 Termodinámica — la Energía Libre de Gibbs como umbral de existencia**
+  (`ampa/chemistry/{balance,thermo,compatibility}.py`, **ADR 0016** y módulo
+  `docs/modulos/termodinamica.md`): **balanceo general** de ecuaciones por espacio
+  nulo (`Fraction`, exacto); **ΔG = ΔH − T·ΔS** con datos estándar curados (ΔHf°,
+  S°), **temperatura de cruce** y motor entálpico/entrópico; **compatibilidad** entre
+  elementos (tipo de enlace por ΔEN, fórmula por aspa de cargas y ΔG de formación).
+  Endpoints `POST /api/quimica/{balancear,proyectar,compatibilidad}`. Reproduce los
+  casos clásicos (Na+agua, el óxido hidratado que colapsa a NaOH, la caliza a ~1120 K).
+  +27 pruebas (**142** en total).
+- **Frontend de proyección**: `Proyeccion.jsx` (reactivos→productos + slider de
+  temperatura → ecuación, ΔH/ΔS/ΔG y veredicto con color) y `Compatibilidad.jsx`
+  (dos elementos → enlace, fórmula y ΔG). Estilos nuevos.
+- **Editor — encadenar átomos**: arrastrar desde un átomo crea átomo + enlace en un
+  gesto (o enlaza si sueltas sobre otro), con línea guía. **Visor 3D**: exportar PNG.
+- **Grafo enriquecido**: **buscador** (resalta/atenúa) y **agrupar por
+  época/corriente** con leyenda de colores (`POST /api/filosofia/clasificar`).
+  +1 prueba (**143** en total).
 - **`ampa ampakadabra`** ✨: un solo comando que **conjura web + API** — compila el
   frontend si hace falta, lo sirve junto a la API desde el **mismo servidor** (un
   artefacto portable) y abre el navegador. La API sirve el build de React con
